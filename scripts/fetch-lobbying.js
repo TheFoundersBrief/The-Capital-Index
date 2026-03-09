@@ -98,34 +98,9 @@ async function main() {
   const revolvingContacts = await fetchRevolvingDoorContacts();
   console.log(`  ✓ ${revolvingContacts.length} revolving door contacts fetched`);
 
-  await sleep(500);
-
-  // Per-member lobbying search for current members
-  // This finds if any active member appears as a covered official
   const memberLobbyingMap = {};
-  console.log(`\n  Cross-referencing ${members.length} members against LDA database...`);
-
-  for (let i = 0; i < members.length; i++) {
-    const m = members[i];
-    if (!m.lastName) continue;
-
-    const registrations = await searchLDAByName(m.firstName, m.lastName);
-    if (registrations.length > 0) {
-      memberLobbyingMap[m.bioguideId] = registrations.map(r => ({
-        registrantName: r.registrant?.name || r.registrant_name || '—',
-        clientName:     r.client?.name || r.client_name || '—',
-        filingYear:     r.registration_date?.substring(0, 4) || '—',
-        generalIssues:  (r.lobbying_activities || []).map(a => a.general_issue_code_display).join(', '),
-        url:            `https://lda.senate.gov/filings/public/filing/${r.filing_uuid || ''}/print/`,
-      }));
-    }
-
-    if (i % 50 === 0) console.log(`  ${i}/${members.length}...`);
-    await sleep(200);
-  }
-
-  const membersWithConnections = Object.keys(memberLobbyingMap).length;
-  console.log(`\n  Found lobbying connections for ${membersWithConnections} current members`);
+  const membersWithConnections = 0;
+  console.log('  Per-member LDA lookup deferred to client-side.');
 
   const output = {
     fetchedAt:         new Date().toISOString(),
