@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-03-09T21:24:13.911Z",
+  "fetchedAt": "2026-03-09T21:43:24.858Z",
   "source": "Senate LDA API v1 (lda.senate.gov)",
   "totalFilings": 50,
   "revolvingContacts": 25,
@@ -33,6 +33,24 @@
       "postedAt": "2026-03-09T16:07:51-04:00"
     },
     {
+      "id": "964765f7-5df2-4dd3-a186-11da4a459dfc",
+      "registrantName": "AKIN GUMP STRAUSS HAUER & FELD",
+      "clientName": "SPOTIFY USA INC.",
+      "type": "Registration",
+      "year": 2026,
+      "period": "—",
+      "postedAt": "2026-03-09T15:31:22-04:00"
+    },
+    {
+      "id": "e076038d-bc37-4e60-9319-354db4ce7b18",
+      "registrantName": "K&L GATES, LLP",
+      "clientName": "ENGINEERED TAX SERVICES, INC.",
+      "type": "Registration",
+      "year": 2026,
+      "period": "—",
+      "postedAt": "2026-03-09T15:20:18-04:00"
+    },
+    {
       "id": "8881d133-e9bb-4854-a1d7-75d3269cf0a4",
       "registrantName": "HARBINGER STRATEGIES, LLC",
       "clientName": "STARBUCKS",
@@ -151,7 +169,7 @@
     },
     {
       "id": "f1d972cd-3783-41f8-85f8-363510dd6dc2",
-      "registrantName": "JEFFREY J. KIMBELL & ASSOCIATES, INC.",
+      "registrantName": "JEFFREY J. KIMBELL AND ASSOCIATES",
       "clientName": "BIOGEN INC.",
       "type": "4th Quarter - Amendment",
       "year": 2024,
@@ -177,6 +195,24 @@
       "postedAt": "2026-03-09T12:51:51-04:00"
     },
     {
+      "id": "e4906678-7b36-44cc-ba45-3e839f6d3843",
+      "registrantName": "JEFFREY J. KIMBELL AND ASSOCIATES",
+      "clientName": "WE WORK FOR HEALTH",
+      "type": "4th Quarter - Amendment",
+      "year": 2024,
+      "period": "—",
+      "postedAt": "2026-03-09T12:43:32-04:00"
+    },
+    {
+      "id": "ab388ff9-d8b9-4d86-88ed-f8acd11bd47b",
+      "registrantName": "JEFFREY J. KIMBELL AND ASSOCIATES",
+      "clientName": "MOMENTOUS",
+      "type": "4th Quarter - Amendment",
+      "year": 2024,
+      "period": "—",
+      "postedAt": "2026-03-09T12:41:50-04:00"
+    },
+    {
       "id": "5bdef9fd-f6ee-41f9-8787-b6cddaff1dbf",
       "registrantName": "A1.9 STRATEGIES LLC",
       "clientName": "C2 STRATEGIES (FKA O'BRIEN,GENTRY,& SCOTT) OBO GREEN AMMO AS",
@@ -186,49 +222,13 @@
       "postedAt": "2026-03-09T12:41:22-04:00"
     },
     {
-      "id": "a6a413f0-641b-498e-b858-abefa894fb17",
-      "registrantName": "SQUIRE PATTON BOGGS",
-      "clientName": "JBT MAREL CORPORATION",
-      "type": "Registration",
-      "year": 2026,
-      "period": "—",
-      "postedAt": "2026-03-09T12:23:35-04:00"
-    },
-    {
-      "id": "167d5a18-ac8a-4338-9c27-1b45698fa276",
-      "registrantName": "ALSTON & BIRD LLP",
-      "clientName": "UNITED STATES OLYMPIC & PARALYMPIC COMMITTEE",
-      "type": "Registration",
-      "year": 2026,
-      "period": "—",
-      "postedAt": "2026-03-09T12:09:01-04:00"
-    },
-    {
-      "id": "8e3282f1-49fc-4431-9e66-7a89ace6113d",
-      "registrantName": "NAPATREE TECHNOLOGY, LLC",
-      "clientName": "NAPATREE TECHNOLOGY, LLC",
-      "type": "Registration",
-      "year": 2026,
-      "period": "—",
-      "postedAt": "2026-03-09T11:59:40-04:00"
-    },
-    {
-      "id": "1627d41c-afc9-416d-8d87-777a15d9590c",
-      "registrantName": "JEFFREY J. KIMBELL & ASSOCIATES, INC.",
-      "clientName": "GILEAD SCIENCES, INC.",
+      "id": "a0b8205e-f432-49d9-9714-71edf64d9470",
+      "registrantName": "JEFFREY J. KIMBELL AND ASSOCIATES",
+      "clientName": "COLLEGIUM PHARMACEUTICAL",
       "type": "4th Quarter - Amendment",
       "year": 2024,
       "period": "—",
-      "postedAt": "2026-03-09T11:52:00-04:00"
-    },
-    {
-      "id": "1206dfb5-82bf-4cc4-8757-978fc9cb02cf",
-      "registrantName": "JEFFREY J. KIMBELL & ASSOCIATES, INC.",
-      "clientName": "BROOKDALE SENIOR LIVING INC.",
-      "type": "4th Quarter - Amendment",
-      "year": 2024,
-      "period": "—",
-      "postedAt": "2026-03-09T11:50:24-04:00"
+      "postedAt": "2026-03-09T12:40:23-04:00"
     },
     {
       "id": "46a19088-9452-4fee-80ce-833b73f2fdd4",
@@ -258,6 +258,24 @@
       "postedAt": "2026-03-09T16:07:51-04:00"
     },
     {
+      "id": "964765f7-5df2-4dd3-a186-11da4a459dfc",
+      "registrantName": "AKIN GUMP STRAUSS HAUER & FELD",
+      "clientName": "SPOTIFY USA INC.",
+      "type": "Registration",
+      "year": 2026,
+      "period": "—",
+      "postedAt": "2026-03-09T15:31:22-04:00"
+    },
+    {
+      "id": "e076038d-bc37-4e60-9319-354db4ce7b18",
+      "registrantName": "K&L GATES, LLP",
+      "clientName": "ENGINEERED TAX SERVICES, INC.",
+      "type": "Registration",
+      "year": 2026,
+      "period": "—",
+      "postedAt": "2026-03-09T15:20:18-04:00"
+    },
+    {
       "id": "8881d133-e9bb-4854-a1d7-75d3269cf0a4",
       "registrantName": "HARBINGER STRATEGIES, LLC",
       "clientName": "STARBUCKS",
@@ -376,7 +394,7 @@
     },
     {
       "id": "f1d972cd-3783-41f8-85f8-363510dd6dc2",
-      "registrantName": "JEFFREY J. KIMBELL & ASSOCIATES, INC.",
+      "registrantName": "JEFFREY J. KIMBELL AND ASSOCIATES",
       "clientName": "BIOGEN INC.",
       "type": "4th Quarter - Amendment",
       "year": 2024,
@@ -402,6 +420,24 @@
       "postedAt": "2026-03-09T12:51:51-04:00"
     },
     {
+      "id": "e4906678-7b36-44cc-ba45-3e839f6d3843",
+      "registrantName": "JEFFREY J. KIMBELL AND ASSOCIATES",
+      "clientName": "WE WORK FOR HEALTH",
+      "type": "4th Quarter - Amendment",
+      "year": 2024,
+      "period": "—",
+      "postedAt": "2026-03-09T12:43:32-04:00"
+    },
+    {
+      "id": "ab388ff9-d8b9-4d86-88ed-f8acd11bd47b",
+      "registrantName": "JEFFREY J. KIMBELL AND ASSOCIATES",
+      "clientName": "MOMENTOUS",
+      "type": "4th Quarter - Amendment",
+      "year": 2024,
+      "period": "—",
+      "postedAt": "2026-03-09T12:41:50-04:00"
+    },
+    {
       "id": "5bdef9fd-f6ee-41f9-8787-b6cddaff1dbf",
       "registrantName": "A1.9 STRATEGIES LLC",
       "clientName": "C2 STRATEGIES (FKA O'BRIEN,GENTRY,& SCOTT) OBO GREEN AMMO AS",
@@ -411,49 +447,13 @@
       "postedAt": "2026-03-09T12:41:22-04:00"
     },
     {
-      "id": "a6a413f0-641b-498e-b858-abefa894fb17",
-      "registrantName": "SQUIRE PATTON BOGGS",
-      "clientName": "JBT MAREL CORPORATION",
-      "type": "Registration",
-      "year": 2026,
-      "period": "—",
-      "postedAt": "2026-03-09T12:23:35-04:00"
-    },
-    {
-      "id": "167d5a18-ac8a-4338-9c27-1b45698fa276",
-      "registrantName": "ALSTON & BIRD LLP",
-      "clientName": "UNITED STATES OLYMPIC & PARALYMPIC COMMITTEE",
-      "type": "Registration",
-      "year": 2026,
-      "period": "—",
-      "postedAt": "2026-03-09T12:09:01-04:00"
-    },
-    {
-      "id": "8e3282f1-49fc-4431-9e66-7a89ace6113d",
-      "registrantName": "NAPATREE TECHNOLOGY, LLC",
-      "clientName": "NAPATREE TECHNOLOGY, LLC",
-      "type": "Registration",
-      "year": 2026,
-      "period": "—",
-      "postedAt": "2026-03-09T11:59:40-04:00"
-    },
-    {
-      "id": "1627d41c-afc9-416d-8d87-777a15d9590c",
-      "registrantName": "JEFFREY J. KIMBELL & ASSOCIATES, INC.",
-      "clientName": "GILEAD SCIENCES, INC.",
+      "id": "a0b8205e-f432-49d9-9714-71edf64d9470",
+      "registrantName": "JEFFREY J. KIMBELL AND ASSOCIATES",
+      "clientName": "COLLEGIUM PHARMACEUTICAL",
       "type": "4th Quarter - Amendment",
       "year": 2024,
       "period": "—",
-      "postedAt": "2026-03-09T11:52:00-04:00"
-    },
-    {
-      "id": "1206dfb5-82bf-4cc4-8757-978fc9cb02cf",
-      "registrantName": "JEFFREY J. KIMBELL & ASSOCIATES, INC.",
-      "clientName": "BROOKDALE SENIOR LIVING INC.",
-      "type": "4th Quarter - Amendment",
-      "year": 2024,
-      "period": "—",
-      "postedAt": "2026-03-09T11:50:24-04:00"
+      "postedAt": "2026-03-09T12:40:23-04:00"
     }
   ],
   "memberLobbyingMap": {}
