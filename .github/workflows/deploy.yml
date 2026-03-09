@@ -1,20 +1,12 @@
 name: Fetch Data & Deploy to GitHub Pages
-
 on:
-  # Run automatically every day at 6:00 AM UTC (2AM ET / 11PM PT)
   schedule:
     - cron: '0 6 * * *'
-    workflow_dispatch: 
-
-  # Also run on every push to main (for manual updates / code changes)
   push:
     branches:
       - main
-
-  # Allow manual trigger from the GitHub Actions tab
   workflow_dispatch:
 
-# Grant write permission to push the built site to gh-pages branch
 permissions:
   contents: write
   pages: write
@@ -24,13 +16,10 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     timeout-minutes: 15
-
     steps:
-      # ── 1. Check out the repository ──────────────────────────────
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # ── 2. Set up Node.js for the build script ───────────────────
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -38,12 +27,10 @@ jobs:
           cache: 'npm'
           cache-dependency-path: scripts/package.json
 
-      # ── 3. Install script dependencies ───────────────────────────
       - name: Install dependencies
         working-directory: scripts
         run: npm ci
 
-      # ── 4. Fetch all live data from public APIs ───────────────────
       - name: Fetch Congressional data from Congress.gov
         working-directory: scripts
         env:
@@ -62,12 +49,10 @@ jobs:
         working-directory: scripts
         run: node fetch-lobbying.js
 
-      # ── 5. Bake fetched JSON into the HTML file ───────────────────
       - name: Build site — inject data into HTML
         working-directory: scripts
         run: node build.js
 
-      # ── 6. Commit updated data files (for transparency / history) ─
       - name: Commit updated data files
         run: |
           git config user.name "Capitol Index Bot"
@@ -76,7 +61,6 @@ jobs:
           git diff --staged --quiet || git commit -m "chore: auto-update data $(date -u '+%Y-%m-%d %H:%M UTC')"
           git push origin main || echo "No data changes to push"
 
-      # ── 7. Deploy built site to GitHub Pages ─────────────────────
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
@@ -85,7 +69,6 @@ jobs:
           commit_message: "deploy: ${{ github.sha }} — $(date -u '+%Y-%m-%d %H:%M UTC')"
           force_orphan: false
 
-  # ── Notify on failure ────────────────────────────────────────────
   notify-on-failure:
     runs-on: ubuntu-latest
     needs: build-and-deploy
