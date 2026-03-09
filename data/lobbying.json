@@ -1,11 +1,20 @@
 {
-  "fetchedAt": "2026-03-09T20:49:19.377Z",
+  "fetchedAt": "2026-03-09T21:24:13.911Z",
   "source": "Senate LDA API v1 (lda.senate.gov)",
   "totalFilings": 50,
   "revolvingContacts": 25,
   "membersWithLobbyingHistory": 0,
   "recentFilings": [
     {
+      "id": "46a19088-9452-4fee-80ce-833b73f2fdd4",
+      "registrantName": "THE FEIGHAN TEAM",
+      "clientName": "MOFI",
+      "type": "4th Quarter - Termination (No Activity)",
+      "year": 2025,
+      "period": "—",
+      "postedAt": "2026-03-09T16:51:58-04:00"
+    },
+    {
       "id": "e0420820-6d55-4f74-b2bf-e40add1d4ff1",
       "registrantName": "EARL POMEROY LLC",
       "clientName": "ALLSUP, INC.",
@@ -33,6 +42,15 @@
       "postedAt": "2026-03-09T15:17:58-04:00"
     },
     {
+      "id": "ffb5e0e6-1d16-48c4-90f3-17395cab5d46",
+      "registrantName": "HARBINGER STRATEGIES, LLC",
+      "clientName": "EDISON ELECTRIC INSTITUTE",
+      "type": "Registration",
+      "year": 2026,
+      "period": "—",
+      "postedAt": "2026-03-09T15:09:57-04:00"
+    },
+    {
       "id": "41b313d5-80f9-48b4-927b-a31d71061391",
       "registrantName": "THE KIDNEY CARE COUNCIL",
       "clientName": "KIDNEY CARE COUNCIL",
@@ -49,6 +67,15 @@
       "year": 2025,
       "period": "—",
       "postedAt": "2026-03-09T14:24:57-04:00"
+    },
+    {
+      "id": "fb7fed96-f152-4700-bb3d-6cd848a19cac",
+      "registrantName": "MARSHALL & POPP, LLC",
+      "clientName": "GLAXOSMITHKLINE",
+      "type": "Registration",
+      "year": 2026,
+      "period": "—",
+      "postedAt": "2026-03-09T14:24:43-04:00"
     },
     {
       "id": "547dcf59-bce0-44bb-84ce-093e3d88ae23",
@@ -204,31 +231,13 @@
       "postedAt": "2026-03-09T11:50:24-04:00"
     },
     {
-      "id": "20d051da-4414-433b-abf2-e5ca1a078751",
-      "registrantName": "JEFFREY J. KIMBELL & ASSOCIATES, INC.",
-      "clientName": "CATALYST PHARMACEUTICALS",
-      "type": "4th Quarter - Amendment",
-      "year": 2024,
+      "id": "46a19088-9452-4fee-80ce-833b73f2fdd4",
+      "registrantName": "THE FEIGHAN TEAM",
+      "clientName": "MOFI",
+      "type": "4th Quarter - Termination (No Activity)",
+      "year": 2025,
       "period": "—",
-      "postedAt": "2026-03-09T11:30:43-04:00"
-    },
-    {
-      "id": "43d52675-fe5f-4117-b4b3-e3546f15dc98",
-      "registrantName": "JEFFREY J. KIMBELL & ASSOCIATES, INC.",
-      "clientName": "HARMONY BIOSCIENCES, LLC",
-      "type": "4th Quarter - Amendment",
-      "year": 2024,
-      "period": "—",
-      "postedAt": "2026-03-09T11:29:54-04:00"
-    },
-    {
-      "id": "de7fd919-8e0a-48cc-9732-0a0d7fb05e29",
-      "registrantName": "JEFFREY J. KIMBELL & ASSOCIATES, INC.",
-      "clientName": "ARDELYX, INC.",
-      "type": "4th Quarter - Amendment",
-      "year": 2024,
-      "period": "—",
-      "postedAt": "2026-03-09T11:28:24-04:00"
+      "postedAt": "2026-03-09T16:51:58-04:00"
     },
     {
       "id": "e0420820-6d55-4f74-b2bf-e40add1d4ff1",
@@ -258,6 +267,15 @@
       "postedAt": "2026-03-09T15:17:58-04:00"
     },
     {
+      "id": "ffb5e0e6-1d16-48c4-90f3-17395cab5d46",
+      "registrantName": "HARBINGER STRATEGIES, LLC",
+      "clientName": "EDISON ELECTRIC INSTITUTE",
+      "type": "Registration",
+      "year": 2026,
+      "period": "—",
+      "postedAt": "2026-03-09T15:09:57-04:00"
+    },
+    {
       "id": "41b313d5-80f9-48b4-927b-a31d71061391",
       "registrantName": "THE KIDNEY CARE COUNCIL",
       "clientName": "KIDNEY CARE COUNCIL",
@@ -274,6 +292,15 @@
       "year": 2025,
       "period": "—",
       "postedAt": "2026-03-09T14:24:57-04:00"
+    },
+    {
+      "id": "fb7fed96-f152-4700-bb3d-6cd848a19cac",
+      "registrantName": "MARSHALL & POPP, LLC",
+      "clientName": "GLAXOSMITHKLINE",
+      "type": "Registration",
+      "year": 2026,
+      "period": "—",
+      "postedAt": "2026-03-09T14:24:43-04:00"
     },
     {
       "id": "547dcf59-bce0-44bb-84ce-093e3d88ae23",
@@ -427,33 +454,6 @@
       "year": 2024,
       "period": "—",
       "postedAt": "2026-03-09T11:50:24-04:00"
-    },
-    {
-      "id": "20d051da-4414-433b-abf2-e5ca1a078751",
-      "registrantName": "JEFFREY J. KIMBELL & ASSOCIATES, INC.",
-      "clientName": "CATALYST PHARMACEUTICALS",
-      "type": "4th Quarter - Amendment",
-      "year": 2024,
-      "period": "—",
-      "postedAt": "2026-03-09T11:30:43-04:00"
-    },
-    {
-      "id": "43d52675-fe5f-4117-b4b3-e3546f15dc98",
-      "registrantName": "JEFFREY J. KIMBELL & ASSOCIATES, INC.",
-      "clientName": "HARMONY BIOSCIENCES, LLC",
-      "type": "4th Quarter - Amendment",
-      "year": 2024,
-      "period": "—",
-      "postedAt": "2026-03-09T11:29:54-04:00"
-    },
-    {
-      "id": "de7fd919-8e0a-48cc-9732-0a0d7fb05e29",
-      "registrantName": "JEFFREY J. KIMBELL & ASSOCIATES, INC.",
-      "clientName": "ARDELYX, INC.",
-      "type": "4th Quarter - Amendment",
-      "year": 2024,
-      "period": "—",
-      "postedAt": "2026-03-09T11:28:24-04:00"
     }
   ],
   "memberLobbyingMap": {}
