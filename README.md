@@ -8,7 +8,7 @@ Live member profiles, legislation tracking, STOCK Act disclosures, campaign fina
 
 ## 🚀 Live Site
 
-**`https:// TheFoundersBrief.github.io/capitol-index`**
+**`https://TheFoundersBrief.github.io/capitol-index`**
 
 
 ---
