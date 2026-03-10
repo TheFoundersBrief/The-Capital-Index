@@ -1,234 +1,45 @@
 {
-  "fetchedAt": "2026-03-09T21:43:24.858Z",
+  "fetchedAt": "2026-03-10T08:09:58.319Z",
   "source": "Senate LDA API v1 (lda.senate.gov)",
   "totalFilings": 50,
   "revolvingContacts": 25,
   "membersWithLobbyingHistory": 0,
   "recentFilings": [
     {
-      "id": "46a19088-9452-4fee-80ce-833b73f2fdd4",
-      "registrantName": "THE FEIGHAN TEAM",
-      "clientName": "MOFI",
-      "type": "4th Quarter - Termination (No Activity)",
-      "year": 2025,
-      "period": "—",
-      "postedAt": "2026-03-09T16:51:58-04:00"
-    },
-    {
-      "id": "e0420820-6d55-4f74-b2bf-e40add1d4ff1",
-      "registrantName": "EARL POMEROY LLC",
-      "clientName": "ALLSUP, INC.",
-      "type": "4th Quarter - Amendment",
-      "year": 2025,
-      "period": "—",
-      "postedAt": "2026-03-09T16:27:26-04:00"
-    },
-    {
-      "id": "42aeb77d-4de7-4f0e-8f12-2a95fcc45547",
-      "registrantName": "PATRICIA MARKS",
-      "clientName": "UTE INDIAN TRIBE ON BEHALF OF PATTERSON EARNHART LLP",
-      "type": "4th Quarter - Report",
-      "year": 2025,
-      "period": "—",
-      "postedAt": "2026-03-09T16:07:51-04:00"
-    },
-    {
-      "id": "964765f7-5df2-4dd3-a186-11da4a459dfc",
-      "registrantName": "AKIN GUMP STRAUSS HAUER & FELD",
-      "clientName": "SPOTIFY USA INC.",
-      "type": "Registration",
-      "year": 2026,
-      "period": "—",
-      "postedAt": "2026-03-09T15:31:22-04:00"
-    },
-    {
-      "id": "e076038d-bc37-4e60-9319-354db4ce7b18",
-      "registrantName": "K&L GATES, LLP",
-      "clientName": "ENGINEERED TAX SERVICES, INC.",
-      "type": "Registration",
-      "year": 2026,
-      "period": "—",
-      "postedAt": "2026-03-09T15:20:18-04:00"
-    },
-    {
-      "id": "8881d133-e9bb-4854-a1d7-75d3269cf0a4",
-      "registrantName": "HARBINGER STRATEGIES, LLC",
-      "clientName": "STARBUCKS",
-      "type": "4th Quarter - Termination",
-      "year": 2025,
-      "period": "—",
-      "postedAt": "2026-03-09T15:17:58-04:00"
-    },
-    {
-      "id": "ffb5e0e6-1d16-48c4-90f3-17395cab5d46",
-      "registrantName": "HARBINGER STRATEGIES, LLC",
-      "clientName": "EDISON ELECTRIC INSTITUTE",
-      "type": "Registration",
-      "year": 2026,
-      "period": "—",
-      "postedAt": "2026-03-09T15:09:57-04:00"
-    },
-    {
-      "id": "41b313d5-80f9-48b4-927b-a31d71061391",
-      "registrantName": "THE KIDNEY CARE COUNCIL",
-      "clientName": "KIDNEY CARE COUNCIL",
-      "type": "1st Quarter - Report",
-      "year": 2026,
-      "period": "—",
-      "postedAt": "2026-03-09T14:41:59-04:00"
-    },
-    {
-      "id": "97365f8c-1291-4f2a-be58-4d726b07cd43",
-      "registrantName": "THE KIDNEY CARE COUNCIL",
-      "clientName": "KIDNEY CARE COUNCIL",
-      "type": "4th Quarter - Report",
-      "year": 2025,
-      "period": "—",
-      "postedAt": "2026-03-09T14:24:57-04:00"
-    },
-    {
-      "id": "fb7fed96-f152-4700-bb3d-6cd848a19cac",
-      "registrantName": "MARSHALL & POPP, LLC",
-      "clientName": "GLAXOSMITHKLINE",
-      "type": "Registration",
-      "year": 2026,
-      "period": "—",
-      "postedAt": "2026-03-09T14:24:43-04:00"
-    },
-    {
-      "id": "547dcf59-bce0-44bb-84ce-093e3d88ae23",
-      "registrantName": "THE KIDNEY CARE COUNCIL",
-      "clientName": "KIDNEY CARE COUNCIL",
-      "type": "3rd Quarter - Report",
-      "year": 2025,
-      "period": "—",
-      "postedAt": "2026-03-09T14:22:07-04:00"
-    },
-    {
-      "id": "8a7e8ab0-c142-450c-ba3e-c43f3ed36d9c",
-      "registrantName": "BOCKORNY GROUP, INC.",
-      "clientName": "PLUTON BIOSCIENCES, INC.",
-      "type": "1st Quarter - Termination",
-      "year": 2026,
-      "period": "—",
-      "postedAt": "2026-03-09T14:12:22-04:00"
-    },
-    {
-      "id": "03408520-3a9f-43f5-b734-420c723ba93b",
-      "registrantName": "AMERICAN JEWISH COMMITTEE",
-      "clientName": "AMERICAN JEWISH COMMITTEE",
-      "type": "4th Quarter - Report",
-      "year": 2025,
-      "period": "—",
-      "postedAt": "2026-03-09T14:08:59-04:00"
-    },
-    {
-      "id": "7a19e410-60b5-4406-a308-b8d43f2b8c81",
-      "registrantName": "BOCKORNY GROUP, INC.",
-      "clientName": "AGRAGENE",
-      "type": "1st Quarter - Termination",
-      "year": 2026,
-      "period": "—",
-      "postedAt": "2026-03-09T14:08:12-04:00"
-    },
-    {
-      "id": "9eec86a8-a7f2-4587-9d1d-507b84a68b0d",
-      "registrantName": "BOCKORNY GROUP, INC.",
-      "clientName": "PAYTIENT TECHNOLOGIES INC",
-      "type": "1st Quarter - Report",
-      "year": 2026,
-      "period": "—",
-      "postedAt": "2026-03-09T14:06:39-04:00"
-    },
-    {
-      "id": "aba80ebd-d186-4998-8831-74e9782a3420",
-      "registrantName": "BOCKORNY GROUP, INC.",
-      "clientName": "FIND SOLACE, INC.",
-      "type": "1st Quarter - Termination",
-      "year": 2026,
-      "period": "—",
-      "postedAt": "2026-03-09T14:04:54-04:00"
-    },
-    {
-      "id": "0b658605-75ce-4163-a2bc-fb7b0f2467fb",
-      "registrantName": "BOCKORNY GROUP, INC.",
-      "clientName": "SURDEX CORPORATION",
-      "type": "1st Quarter - Termination",
-      "year": 2026,
-      "period": "—",
-      "postedAt": "2026-03-09T14:03:24-04:00"
-    },
-    {
-      "id": "96938e67-6182-48ce-96f2-9553ba167f98",
-      "registrantName": "BOCKORNY GROUP, INC.",
-      "clientName": "BIOSTL",
-      "type": "1st Quarter - Termination",
-      "year": 2026,
-      "period": "—",
-      "postedAt": "2026-03-09T14:01:19-04:00"
-    },
-    {
-      "id": "f1d972cd-3783-41f8-85f8-363510dd6dc2",
-      "registrantName": "JEFFREY J. KIMBELL AND ASSOCIATES",
-      "clientName": "BIOGEN INC.",
+      "id": "47763f1f-acc1-4c5b-87ec-a938cc7ece46",
+      "registrantName": "THE PATRIOTIC MILLIONAIRES LLC",
+      "clientName": "THE PATRIOTIC MILLIONAIRES LLC",
       "type": "4th Quarter - Amendment",
       "year": 2024,
       "period": "—",
-      "postedAt": "2026-03-09T13:43:25-04:00"
+      "postedAt": "2026-03-09T19:05:23-04:00"
     },
     {
-      "id": "332725e4-ad6a-4d53-b83e-f2f666cf7fb2",
-      "registrantName": "THE GRIFFIN GROUP GLOBAL, LLC",
-      "clientName": "RETLIF TESTING LABS",
-      "type": "4th Quarter - Report",
+      "id": "7b1318c9-2b05-4242-8cd8-d25510672fe4",
+      "registrantName": "NOVARTIS",
+      "clientName": "NOVARTIS",
+      "type": "3rd Quarter - Amendment",
       "year": 2025,
       "period": "—",
-      "postedAt": "2026-03-09T13:03:03-04:00"
+      "postedAt": "2026-03-09T18:38:58-04:00"
     },
     {
-      "id": "32a75e1f-b056-4616-879b-6ba91016c909",
-      "registrantName": "DC ADVOCACY, LLC",
-      "clientName": "P5 INFRA",
-      "type": "Registration",
-      "year": 2026,
+      "id": "fb83c94e-6544-4804-9a49-55a037767b57",
+      "registrantName": "NOVARTIS",
+      "clientName": "NOVARTIS",
+      "type": "2nd Quarter - Amendment",
+      "year": 2025,
       "period": "—",
-      "postedAt": "2026-03-09T12:51:51-04:00"
+      "postedAt": "2026-03-09T18:19:36-04:00"
     },
     {
-      "id": "e4906678-7b36-44cc-ba45-3e839f6d3843",
-      "registrantName": "JEFFREY J. KIMBELL AND ASSOCIATES",
-      "clientName": "WE WORK FOR HEALTH",
+      "id": "44dfff2b-dfb3-4577-a441-eba3f2f4c32c",
+      "registrantName": "NADIK CONSULTING",
+      "clientName": "SOUTH CAROLINA STATE UNIVERSITY",
       "type": "4th Quarter - Amendment",
-      "year": 2024,
+      "year": 2025,
       "period": "—",
-      "postedAt": "2026-03-09T12:43:32-04:00"
-    },
-    {
-      "id": "ab388ff9-d8b9-4d86-88ed-f8acd11bd47b",
-      "registrantName": "JEFFREY J. KIMBELL AND ASSOCIATES",
-      "clientName": "MOMENTOUS",
-      "type": "4th Quarter - Amendment",
-      "year": 2024,
-      "period": "—",
-      "postedAt": "2026-03-09T12:41:50-04:00"
-    },
-    {
-      "id": "5bdef9fd-f6ee-41f9-8787-b6cddaff1dbf",
-      "registrantName": "A1.9 STRATEGIES LLC",
-      "clientName": "C2 STRATEGIES (FKA O'BRIEN,GENTRY,& SCOTT) OBO GREEN AMMO AS",
-      "type": "Registration",
-      "year": 2026,
-      "period": "—",
-      "postedAt": "2026-03-09T12:41:22-04:00"
-    },
-    {
-      "id": "a0b8205e-f432-49d9-9714-71edf64d9470",
-      "registrantName": "JEFFREY J. KIMBELL AND ASSOCIATES",
-      "clientName": "COLLEGIUM PHARMACEUTICAL",
-      "type": "4th Quarter - Amendment",
-      "year": 2024,
-      "period": "—",
-      "postedAt": "2026-03-09T12:40:23-04:00"
+      "postedAt": "2026-03-09T17:53:22-04:00"
     },
     {
       "id": "46a19088-9452-4fee-80ce-833b73f2fdd4",
@@ -411,49 +222,238 @@
       "postedAt": "2026-03-09T13:03:03-04:00"
     },
     {
-      "id": "32a75e1f-b056-4616-879b-6ba91016c909",
-      "registrantName": "DC ADVOCACY, LLC",
-      "clientName": "P5 INFRA",
+      "id": "40b7b52d-3877-4585-be02-a52aa5b0532c",
+      "registrantName": "JEFFREY J. KIMBELL AND ASSOCIATES",
+      "clientName": "NEUROTECH PHARMACEUTICALS",
+      "type": "4th Quarter - Amendment",
+      "year": 2024,
+      "period": "—",
+      "postedAt": "2026-03-09T12:54:53-04:00"
+    },
+    {
+      "id": "47763f1f-acc1-4c5b-87ec-a938cc7ece46",
+      "registrantName": "THE PATRIOTIC MILLIONAIRES LLC",
+      "clientName": "THE PATRIOTIC MILLIONAIRES LLC",
+      "type": "4th Quarter - Amendment",
+      "year": 2024,
+      "period": "—",
+      "postedAt": "2026-03-09T19:05:23-04:00"
+    },
+    {
+      "id": "7b1318c9-2b05-4242-8cd8-d25510672fe4",
+      "registrantName": "NOVARTIS",
+      "clientName": "NOVARTIS",
+      "type": "3rd Quarter - Amendment",
+      "year": 2025,
+      "period": "—",
+      "postedAt": "2026-03-09T18:38:58-04:00"
+    },
+    {
+      "id": "fb83c94e-6544-4804-9a49-55a037767b57",
+      "registrantName": "NOVARTIS",
+      "clientName": "NOVARTIS",
+      "type": "2nd Quarter - Amendment",
+      "year": 2025,
+      "period": "—",
+      "postedAt": "2026-03-09T18:19:36-04:00"
+    },
+    {
+      "id": "44dfff2b-dfb3-4577-a441-eba3f2f4c32c",
+      "registrantName": "NADIK CONSULTING",
+      "clientName": "SOUTH CAROLINA STATE UNIVERSITY",
+      "type": "4th Quarter - Amendment",
+      "year": 2025,
+      "period": "—",
+      "postedAt": "2026-03-09T17:53:22-04:00"
+    },
+    {
+      "id": "46a19088-9452-4fee-80ce-833b73f2fdd4",
+      "registrantName": "THE FEIGHAN TEAM",
+      "clientName": "MOFI",
+      "type": "4th Quarter - Termination (No Activity)",
+      "year": 2025,
+      "period": "—",
+      "postedAt": "2026-03-09T16:51:58-04:00"
+    },
+    {
+      "id": "e0420820-6d55-4f74-b2bf-e40add1d4ff1",
+      "registrantName": "EARL POMEROY LLC",
+      "clientName": "ALLSUP, INC.",
+      "type": "4th Quarter - Amendment",
+      "year": 2025,
+      "period": "—",
+      "postedAt": "2026-03-09T16:27:26-04:00"
+    },
+    {
+      "id": "42aeb77d-4de7-4f0e-8f12-2a95fcc45547",
+      "registrantName": "PATRICIA MARKS",
+      "clientName": "UTE INDIAN TRIBE ON BEHALF OF PATTERSON EARNHART LLP",
+      "type": "4th Quarter - Report",
+      "year": 2025,
+      "period": "—",
+      "postedAt": "2026-03-09T16:07:51-04:00"
+    },
+    {
+      "id": "964765f7-5df2-4dd3-a186-11da4a459dfc",
+      "registrantName": "AKIN GUMP STRAUSS HAUER & FELD",
+      "clientName": "SPOTIFY USA INC.",
       "type": "Registration",
       "year": 2026,
       "period": "—",
-      "postedAt": "2026-03-09T12:51:51-04:00"
+      "postedAt": "2026-03-09T15:31:22-04:00"
     },
     {
-      "id": "e4906678-7b36-44cc-ba45-3e839f6d3843",
-      "registrantName": "JEFFREY J. KIMBELL AND ASSOCIATES",
-      "clientName": "WE WORK FOR HEALTH",
-      "type": "4th Quarter - Amendment",
-      "year": 2024,
-      "period": "—",
-      "postedAt": "2026-03-09T12:43:32-04:00"
-    },
-    {
-      "id": "ab388ff9-d8b9-4d86-88ed-f8acd11bd47b",
-      "registrantName": "JEFFREY J. KIMBELL AND ASSOCIATES",
-      "clientName": "MOMENTOUS",
-      "type": "4th Quarter - Amendment",
-      "year": 2024,
-      "period": "—",
-      "postedAt": "2026-03-09T12:41:50-04:00"
-    },
-    {
-      "id": "5bdef9fd-f6ee-41f9-8787-b6cddaff1dbf",
-      "registrantName": "A1.9 STRATEGIES LLC",
-      "clientName": "C2 STRATEGIES (FKA O'BRIEN,GENTRY,& SCOTT) OBO GREEN AMMO AS",
+      "id": "e076038d-bc37-4e60-9319-354db4ce7b18",
+      "registrantName": "K&L GATES, LLP",
+      "clientName": "ENGINEERED TAX SERVICES, INC.",
       "type": "Registration",
       "year": 2026,
       "period": "—",
-      "postedAt": "2026-03-09T12:41:22-04:00"
+      "postedAt": "2026-03-09T15:20:18-04:00"
     },
     {
-      "id": "a0b8205e-f432-49d9-9714-71edf64d9470",
+      "id": "8881d133-e9bb-4854-a1d7-75d3269cf0a4",
+      "registrantName": "HARBINGER STRATEGIES, LLC",
+      "clientName": "STARBUCKS",
+      "type": "4th Quarter - Termination",
+      "year": 2025,
+      "period": "—",
+      "postedAt": "2026-03-09T15:17:58-04:00"
+    },
+    {
+      "id": "ffb5e0e6-1d16-48c4-90f3-17395cab5d46",
+      "registrantName": "HARBINGER STRATEGIES, LLC",
+      "clientName": "EDISON ELECTRIC INSTITUTE",
+      "type": "Registration",
+      "year": 2026,
+      "period": "—",
+      "postedAt": "2026-03-09T15:09:57-04:00"
+    },
+    {
+      "id": "41b313d5-80f9-48b4-927b-a31d71061391",
+      "registrantName": "THE KIDNEY CARE COUNCIL",
+      "clientName": "KIDNEY CARE COUNCIL",
+      "type": "1st Quarter - Report",
+      "year": 2026,
+      "period": "—",
+      "postedAt": "2026-03-09T14:41:59-04:00"
+    },
+    {
+      "id": "97365f8c-1291-4f2a-be58-4d726b07cd43",
+      "registrantName": "THE KIDNEY CARE COUNCIL",
+      "clientName": "KIDNEY CARE COUNCIL",
+      "type": "4th Quarter - Report",
+      "year": 2025,
+      "period": "—",
+      "postedAt": "2026-03-09T14:24:57-04:00"
+    },
+    {
+      "id": "fb7fed96-f152-4700-bb3d-6cd848a19cac",
+      "registrantName": "MARSHALL & POPP, LLC",
+      "clientName": "GLAXOSMITHKLINE",
+      "type": "Registration",
+      "year": 2026,
+      "period": "—",
+      "postedAt": "2026-03-09T14:24:43-04:00"
+    },
+    {
+      "id": "547dcf59-bce0-44bb-84ce-093e3d88ae23",
+      "registrantName": "THE KIDNEY CARE COUNCIL",
+      "clientName": "KIDNEY CARE COUNCIL",
+      "type": "3rd Quarter - Report",
+      "year": 2025,
+      "period": "—",
+      "postedAt": "2026-03-09T14:22:07-04:00"
+    },
+    {
+      "id": "8a7e8ab0-c142-450c-ba3e-c43f3ed36d9c",
+      "registrantName": "BOCKORNY GROUP, INC.",
+      "clientName": "PLUTON BIOSCIENCES, INC.",
+      "type": "1st Quarter - Termination",
+      "year": 2026,
+      "period": "—",
+      "postedAt": "2026-03-09T14:12:22-04:00"
+    },
+    {
+      "id": "03408520-3a9f-43f5-b734-420c723ba93b",
+      "registrantName": "AMERICAN JEWISH COMMITTEE",
+      "clientName": "AMERICAN JEWISH COMMITTEE",
+      "type": "4th Quarter - Report",
+      "year": 2025,
+      "period": "—",
+      "postedAt": "2026-03-09T14:08:59-04:00"
+    },
+    {
+      "id": "7a19e410-60b5-4406-a308-b8d43f2b8c81",
+      "registrantName": "BOCKORNY GROUP, INC.",
+      "clientName": "AGRAGENE",
+      "type": "1st Quarter - Termination",
+      "year": 2026,
+      "period": "—",
+      "postedAt": "2026-03-09T14:08:12-04:00"
+    },
+    {
+      "id": "9eec86a8-a7f2-4587-9d1d-507b84a68b0d",
+      "registrantName": "BOCKORNY GROUP, INC.",
+      "clientName": "PAYTIENT TECHNOLOGIES INC",
+      "type": "1st Quarter - Report",
+      "year": 2026,
+      "period": "—",
+      "postedAt": "2026-03-09T14:06:39-04:00"
+    },
+    {
+      "id": "aba80ebd-d186-4998-8831-74e9782a3420",
+      "registrantName": "BOCKORNY GROUP, INC.",
+      "clientName": "FIND SOLACE, INC.",
+      "type": "1st Quarter - Termination",
+      "year": 2026,
+      "period": "—",
+      "postedAt": "2026-03-09T14:04:54-04:00"
+    },
+    {
+      "id": "0b658605-75ce-4163-a2bc-fb7b0f2467fb",
+      "registrantName": "BOCKORNY GROUP, INC.",
+      "clientName": "SURDEX CORPORATION",
+      "type": "1st Quarter - Termination",
+      "year": 2026,
+      "period": "—",
+      "postedAt": "2026-03-09T14:03:24-04:00"
+    },
+    {
+      "id": "96938e67-6182-48ce-96f2-9553ba167f98",
+      "registrantName": "BOCKORNY GROUP, INC.",
+      "clientName": "BIOSTL",
+      "type": "1st Quarter - Termination",
+      "year": 2026,
+      "period": "—",
+      "postedAt": "2026-03-09T14:01:19-04:00"
+    },
+    {
+      "id": "f1d972cd-3783-41f8-85f8-363510dd6dc2",
       "registrantName": "JEFFREY J. KIMBELL AND ASSOCIATES",
-      "clientName": "COLLEGIUM PHARMACEUTICAL",
+      "clientName": "BIOGEN INC.",
       "type": "4th Quarter - Amendment",
       "year": 2024,
       "period": "—",
-      "postedAt": "2026-03-09T12:40:23-04:00"
+      "postedAt": "2026-03-09T13:43:25-04:00"
+    },
+    {
+      "id": "332725e4-ad6a-4d53-b83e-f2f666cf7fb2",
+      "registrantName": "THE GRIFFIN GROUP GLOBAL, LLC",
+      "clientName": "RETLIF TESTING LABS",
+      "type": "4th Quarter - Report",
+      "year": 2025,
+      "period": "—",
+      "postedAt": "2026-03-09T13:03:03-04:00"
+    },
+    {
+      "id": "40b7b52d-3877-4585-be02-a52aa5b0532c",
+      "registrantName": "JEFFREY J. KIMBELL AND ASSOCIATES",
+      "clientName": "NEUROTECH PHARMACEUTICALS",
+      "type": "4th Quarter - Amendment",
+      "year": 2024,
+      "period": "—",
+      "postedAt": "2026-03-09T12:54:53-04:00"
     }
   ],
   "memberLobbyingMap": {}
