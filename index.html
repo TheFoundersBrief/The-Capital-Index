@@ -469,7 +469,7 @@ async function loadAllMembers() {
     const [page1, page2, socialRaw] = await Promise.all([
       apiFetch('/v3/member?limit=250&offset=0&currentMember=true'),
       apiFetch('/v3/member?limit=250&offset=250&currentMember=true'),
-      fetch('https://raw.githubusercontent.com/unitedstates/congress-legislators/main/legislators-social-media.json')
+      fetch('https://unitedstates.github.io/congress-legislators/legislators-social-media.json')
         .then(r => r.json()).catch(() => []),
     ]);
 
