@@ -444,6 +444,7 @@ let currentView  = 'all';
 let currentPage  = 1;
 let currentMember = null;
 let allBills     = [];   // cached for current member
+let socialMediaMap = {}; // bioguideId → { twitter, youtube, facebook }
 const PAGE_SIZE  = 30;
 
 // ═══════════════════════════════════════════════════════
@@ -465,10 +466,22 @@ async function loadAllMembers() {
   try {
     // Congress.gov /v3/member returns up to 250 per call
     // Fetch two pages to cover all ~535 members
-    const [page1, page2] = await Promise.all([
+    const [page1, page2, socialRaw] = await Promise.all([
       apiFetch('/v3/member?limit=250&offset=0&currentMember=true'),
       apiFetch('/v3/member?limit=250&offset=250&currentMember=true'),
+      fetch('https://raw.githubusercontent.com/unitedstates/congress-legislators/main/legislators-social-media.json')
+        .then(r => r.json()).catch(() => []),
     ]);
+
+    // Build bioguideId → social media lookup
+    for (const s of socialRaw) {
+      const id = s.id?.bioguide;
+      if (id) socialMediaMap[id] = {
+        twitter:  s.social?.twitter  || null,
+        youtube:  s.social?.youtube  || null,
+        facebook: s.social?.facebook || null,
+      };
+    }
 
     const raw1 = page1?.members || [];
     const raw2 = page2?.members || [];
@@ -547,7 +560,9 @@ function normalizeCongressMember(m) {
     missedVotesPct: null,
     votesWithParty: null,
     fecId: null,
-    twitterId: null,
+    twitterId: socialMediaMap[m.bioguideId]?.twitter || null,
+    youtubeId: socialMediaMap[m.bioguideId]?.youtube || null,
+    facebookId: socialMediaMap[m.bioguideId]?.facebook || null,
   };
 }
 
@@ -783,7 +798,9 @@ async function enrichAndRender(m) {
     const d = detail.value.member;
     m.phone     = d.addressInformation?.phoneNumber || m.phone;
     m.office    = d.addressInformation?.officeAddress || '';
-    m.twitterId = d.twitterAccount || null;
+    m.twitterId = socialMediaMap[m.bioguideId]?.twitter || d.twitterAccount || null;
+    m.youtubeId = socialMediaMap[m.bioguideId]?.youtube || d.youtubeAccount || null;
+    m.facebookId= socialMediaMap[m.bioguideId]?.facebook || d.facebookAccount || null;
     m.youtubeId = d.youtubeAccount || null;
     m.facebookId= d.facebookAccount || null;
     m.fecId     = null; // Congress.gov doesn't provide FEC ID directly
@@ -1087,8 +1104,10 @@ function renderContact(m) {
     { label: 'Official Website', html: m.website
         ? `<a href="${m.website}" target="_blank">${m.website}</a>`
         : '<span>—</span>' },
-    { label: 'Twitter / X',   html: m.twitterId
-        ? `<a href="https://twitter.com/${m.twitterId}" target="_blank">@${m.twitterId}</a>`
+    { label: 'X (Twitter)',   html: m.twitterId
+        ? `<a href="https://x.com/${m.twitterId}" target="_blank" style="display:inline-flex;align-items:center;gap:6px">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.259 5.63L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            @${m.twitterId}</a>`
         : '<span>—</span>' },
     { label: 'Congress.gov',  html: `<a href="https://www.congress.gov/member/${m.bioguideId}" target="_blank">View full profile ↗</a>` },
     { label: 'FEC Profile',   html: `<a href="https://www.fec.gov/data/search/?query=${encodeURIComponent(m.name)}&data_type=processed" target="_blank">Search FEC records ↗</a>` },
