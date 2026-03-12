@@ -1008,18 +1008,37 @@ async function renderFinance(m) {
       const candidate = candidates.find(c => c.candidate_status === 'C')
         || candidates.sort((a,b) => (b.active_through||0) - (a.active_through||0))[0];
       if (candidate) {
-        const totPath = `/fec/v1/candidate/${candidate.candidate_id}/totals/?per_page=10&sort=-cycle`;
-        const totRes = await fetch(`${PROXY}${totPath}`);
+        // Fetch totals + committee cash-on-hand in parallel
+        const committeeId = candidate.principal_committees?.[0]?.committee_id;
+        const [totRes, cashRes] = await Promise.all([
+          fetch(`${PROXY}/fec/v1/candidate/${candidate.candidate_id}/totals/?per_page=10&sort=-cycle`),
+          committeeId
+            ? fetch(`${PROXY}/fec/v1/committee/${committeeId}/totals/?per_page=1&sort=-cycle`)
+            : Promise.resolve(null),
+        ]);
+
         if (totRes.ok) {
           const totJson = await totRes.json();
-          // Pick the most recent result that has actual receipts data
           const tot = (totJson.results || []).find(t => t.receipts > 0 && t.cycle) || totJson.results?.[0];
+
+          // Cash on hand comes from committee totals
+          let cashOnHand = '—';
+          if (cashRes?.ok) {
+            const cashJson = await cashRes.json();
+            const cashTot = cashJson.results?.[0];
+            if (cashTot?.cash_on_hand_end_period != null) {
+              cashOnHand = fmtMoney(cashTot.cash_on_hand_end_period);
+            } else if (cashTot?.last_cash_on_hand_end_period != null) {
+              cashOnHand = fmtMoney(cashTot.last_cash_on_hand_end_period);
+            }
+          }
+
           if (tot) {
             finData = {
               candidateId:  candidate.candidate_id,
               name:         candidate.name,
               totalRaised:  fmtMoney(tot.receipts),
-              cashOnHand:   fmtMoney(tot.cash_on_hand_end_period),
+              cashOnHand,
               totalSpent:   fmtMoney(tot.disbursements),
               indivPct:     tot.receipts
                 ? ((tot.individual_itemized_contributions||0)/tot.receipts*100).toFixed(1)+'%'
