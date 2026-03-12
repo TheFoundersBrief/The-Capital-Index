@@ -789,8 +789,8 @@ async function enrichAndRender(m) {
   // Fetch member detail + sponsored legislation in parallel
   const [detail, sponsoredData, cosponsoredData] = await Promise.allSettled([
     apiFetch(`/v3/member/${m.bioguideId}`),
-    apiFetch(`/v3/member/${m.bioguideId}/sponsored-legislation?limit=20`),
-    apiFetch(`/v3/member/${m.bioguideId}/cosponsored-legislation?limit=20`),
+    apiFetch(`/v3/member/${m.bioguideId}/sponsored-legislation?limit=50&congress=119`),
+    apiFetch(`/v3/member/${m.bioguideId}/cosponsored-legislation?limit=50&congress=119`),
   ]);
 
   // Enrich member object with detail data
@@ -824,9 +824,10 @@ async function enrichAndRender(m) {
   const sponsored   = (sponsoredData.status === 'fulfilled'   ? sponsoredData.value?.sponsoredLegislation   : null) || [];
   const cosponsored = (cosponsoredData.status === 'fulfilled' ? cosponsoredData.value?.cosponsoredLegislation : null) || [];
 
+  const isBill = b => b.type && b.title; // filter out amendments which lack these
   allBills = [
-    ...sponsored.map(b   => ({ ...normalizeBill(b), role: 'sponsored' })),
-    ...cosponsored.map(b => ({ ...normalizeBill(b), role: 'cosponsored' })),
+    ...sponsored.filter(isBill).map(b   => ({ ...normalizeBill(b), role: 'sponsored' })),
+    ...cosponsored.filter(isBill).map(b => ({ ...normalizeBill(b), role: 'cosponsored' })),
   ];
 
   // Re-render overview with enriched data
