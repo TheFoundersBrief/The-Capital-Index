@@ -253,7 +253,39 @@
   .zip-toggle { font-family: var(--mono); font-size: 0.68rem; letter-spacing: 1px; text-transform: uppercase; color: #7a9cc0; cursor: pointer; padding: 8px 16px; border: 1px solid rgba(255,255,255,0.15); transition: all 0.15s; white-space: nowrap; }
   .zip-toggle:hover, .zip-toggle.active { color: white; border-color: var(--gold); }
 
-  /* ── STOCK ACT ── */
+  /* ── VOTING RECORD ── */
+  .votes-stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 2px; margin-bottom: 20px; }
+  .votes-stat-card { background: white; border: 1px solid var(--border); padding: 18px 20px; }
+  .votes-stat-card label { font-family: var(--mono); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--silver); display: block; margin-bottom: 8px; }
+  .votes-stat-val { font-family: var(--serif); font-size: 1.55rem; font-weight: 700; line-height: 1; }
+  .votes-stat-sub { font-family: var(--mono); font-size: 0.62rem; color: var(--silver); margin-top: 5px; }
+  .votes-bar-wrap { background: white; border: 1px solid var(--border); padding: 20px; margin-bottom: 20px; }
+  .votes-bar-label { font-family: var(--mono); font-size: 0.62rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--silver); margin-bottom: 10px; }
+  .votes-bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .votes-bar-name { font-family: var(--mono); font-size: 0.68rem; width: 110px; flex-shrink: 0; color: var(--ink); }
+  .votes-bar-track { flex: 1; height: 8px; background: var(--cream); position: relative; overflow: hidden; }
+  .votes-bar-fill { position: absolute; left: 0; top: 0; bottom: 0; transition: width 0.6s ease; }
+  .votes-bar-pct { font-family: var(--mono); font-size: 0.68rem; width: 40px; text-align: right; color: var(--ink); }
+  .votes-recent-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .votes-recent-title { font-family: var(--serif); font-size: 1.05rem; font-weight: 700; }
+  .votes-note { font-family: var(--mono); font-size: 0.62rem; color: var(--silver); }
+  .votes-list { display: flex; flex-direction: column; gap: 2px; margin-bottom: 16px; }
+  .vote-item { background: white; border: 1px solid var(--border); padding: 13px 16px; display: grid; grid-template-columns: 56px 1fr auto; gap: 12px; align-items: start; }
+  .vote-result { font-family: var(--mono); font-size: 0.65rem; padding: 3px 8px; text-transform: uppercase; letter-spacing: 1px; text-align: center; font-weight: 600; }
+  .vote-result.yea  { background: #e0f5e8; color: #1a5c2a; }
+  .vote-result.nay  { background: #fde8e6; color: var(--red); }
+  .vote-result.present { background: #fff8e0; color: #7a5c00; }
+  .vote-result.not-voting { background: var(--cream); color: var(--silver); }
+  .vote-desc { font-family: var(--sans); font-size: 0.84rem; line-height: 1.4; color: var(--ink); }
+  .vote-meta { font-family: var(--mono); font-size: 0.6rem; color: var(--silver); margin-top: 3px; }
+  .vote-outcome { font-family: var(--mono); font-size: 0.62rem; color: var(--silver); white-space: nowrap; padding-top: 2px; }
+  .vote-outcome.passed { color: #1a5c2a; }
+  .vote-outcome.failed { color: var(--red); }
+  .votes-source { font-family: var(--mono); font-size: 0.6rem; color: var(--silver); line-height: 1.9; margin-top: 8px; }
+  .votes-source a { color: var(--gold); }
+  @media (max-width: 900px) { .votes-stats-grid { grid-template-columns: 1fr 1fr; } .vote-item { grid-template-columns: 48px 1fr; } .vote-outcome { display: none; } }
+
+  /* ── VOTING RECORD ── */
   .trades-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 10px; }
   .trades-title { font-family: var(--serif); font-size: 1.1rem; font-weight: 700; }
   .trades-meta { font-family: var(--mono); font-size: 0.65rem; color: var(--silver); }
@@ -427,6 +459,7 @@
       <div class="profile-tab active" onclick="switchTab('overview',this)">Overview</div>
       <div class="profile-tab" onclick="switchTab('bills',this)">Legislation</div>
       <div class="profile-tab" onclick="switchTab('finance',this)">Campaign Finance</div>
+      <div class="profile-tab" onclick="switchTab('votes',this)">Voting Record</div>
       <div class="profile-tab" onclick="switchTab('trades',this)">Stock Trades</div>
       <div class="profile-tab" onclick="switchTab('contact',this)">Contact &amp; Links</div>
     </div>
@@ -464,6 +497,15 @@
           </table>
         </div>
         <div class="finance-note" id="finance-note"></div>
+      </div>
+
+      <div class="profile-panel" id="panel-votes">
+        <div id="votes-content">
+          <div class="loading-state" style="padding:40px 20px">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">Loading voting record…</div>
+          </div>
+        </div>
       </div>
 
       <div class="profile-panel" id="panel-trades">
@@ -1227,6 +1269,10 @@ function switchTab(name, el) {
   document.querySelectorAll('.profile-panel').forEach(p => p.classList.remove('active'));
   document.getElementById('panel-' + name).classList.add('active');
 
+  if (name === 'votes' && currentMember) {
+    loadVotes(currentMember);
+    return;
+  }
   if (name === 'trades' && currentMember) {
     loadTrades(currentMember);
     return;
@@ -1257,6 +1303,7 @@ function closeModal() {
   currentMember = null;
   allBills = [];
   document.getElementById('trades-content').innerHTML = '';
+  document.getElementById('votes-content').innerHTML = '';
 }
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
@@ -1293,6 +1340,219 @@ function populateStateFilter() {
   Object.entries(STATE_NAMES).slice(0,50).forEach(([code, name]) => {
     sel.innerHTML += `<option value="${code}">${name}</option>`;
   });
+}
+
+// ═══════════════════════════════════════════════════════
+// VOTING RECORD
+// Uses GovTrack API for stats + Congress.gov house-vote API for roll calls
+// ═══════════════════════════════════════════════════════
+async function loadVotes(member) {
+  const el = document.getElementById('votes-content');
+  el.innerHTML = `<div class="loading-state" style="padding:40px 20px">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">Loading voting record…</div>
+  </div>`;
+
+  const bioguide  = member.bioguideId;
+  const isHouse   = member.chamber === 'House';
+  const govtrackUrl = `https://www.govtrack.us/congress/members/${bioguide}`;
+
+  try {
+    // ── Step 1: get GovTrack person ID from bioguide ─────────────────────────
+    const personRes = await fetch(
+      `https://www.govtrack.us/api/v2/person?bioguideid=${bioguide}&format=json`
+    );
+    if (!personRes.ok) throw new Error('GovTrack person lookup failed');
+    const personData = await personRes.json();
+    const person = personData.objects?.[0];
+    if (!person) throw new Error('Person not found in GovTrack');
+
+    const personId = person.id;
+
+    // ── Step 2: get current role (for party-line %, missed votes, ideology) ──
+    const roleRes = await fetch(
+      `https://www.govtrack.us/api/v2/role?person=${personId}&current=true&format=json`
+    );
+    const roleData = await roleRes.json();
+    const role = roleData.objects?.[0];
+
+    // ── Step 3: recent votes (House only via Congress.gov; Senate via GovTrack)
+    let recentVotes = [];
+    if (isHouse) {
+      // Congress.gov house-vote member endpoint (beta, 118th+ Congress)
+      try {
+        const vRes = await apiFetch(
+          `/v3/member/${bioguide}/house-votes?limit=20&congress=119&sort=date+desc`
+        );
+        recentVotes = vRes?.votes || vRes?.houseVotes || [];
+      } catch(e) { /* fall through to GovTrack */ }
+    }
+
+    // Fallback: GovTrack vote_voter for both chambers
+    if (!recentVotes.length) {
+      const vvRes = await fetch(
+        `https://www.govtrack.us/api/v2/vote_voter?person=${personId}&limit=20&order_by=-created&format=json`
+      );
+      const vvData = await vvRes.json();
+      recentVotes = (vvData.objects || []).map(v => ({
+        _source: 'govtrack',
+        date: v.vote?.created?.slice(0,10),
+        description: v.vote?.question || v.vote?.description || '—',
+        memberVote: v.option?.value,
+        result: v.vote?.result,
+        rollNumber: v.vote?.number,
+        congress: v.vote?.congress,
+      }));
+    }
+
+    renderVotes(el, member, person, role, recentVotes, govtrackUrl);
+
+  } catch(err) {
+    console.error('Vote load error:', err);
+    // Graceful fallback — show stats link
+    el.innerHTML = `
+      <div class="votes-recent-header" style="margin-bottom:16px">
+        <div class="votes-recent-title">Voting Record</div>
+      </div>
+      <div class="trades-ct-card">
+        <div class="trades-ct-logo">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+          </svg>
+          GovTrack Voting Record
+        </div>
+        <div class="trades-ct-desc">
+          View ${member.name}'s full voting history, party-line voting percentage, missed votes, and ideology score on GovTrack.
+        </div>
+        <div class="trades-ct-links">
+          <a class="trades-ct-btn primary" href="${govtrackUrl}" target="_blank">View on GovTrack ↗</a>
+        </div>
+      </div>
+      <div class="votes-source">
+        Data from <a href="https://www.govtrack.us" target="_blank">GovTrack.us</a> ·
+        <a href="https://clerk.house.gov/Votes" target="_blank">Official House Roll Calls</a> ·
+        <a href="https://www.senate.gov/legislative/votes_new.htm" target="_blank">Official Senate Roll Calls</a>
+      </div>`;
+  }
+}
+
+function renderVotes(el, member, person, role, recentVotes, govtrackUrl) {
+  const party    = member.party;
+  const partyPct = role?.party_line_votes_pct != null
+    ? (role.party_line_votes_pct * 100).toFixed(1) + '%' : '—';
+  const missedPct = role?.missed_votes_pct != null
+    ? role.missed_votes_pct.toFixed(1) + '%' : '—';
+  const ideology = role?.ideology_score != null
+    ? role.ideology_score.toFixed(2) : null;
+  const leadership = role?.leadership_score != null
+    ? (role.leadership_score * 100).toFixed(0) + '%' : '—';
+
+  // Ideology label based on score (−1=far left, +1=far right)
+  let ideologyLabel = '—';
+  let ideologyColor = 'var(--silver)';
+  if (ideology !== null) {
+    const s = parseFloat(ideology);
+    if      (s < -0.4)  { ideologyLabel = 'Progressive';    ideologyColor = '#1a3a5c'; }
+    else if (s < -0.1)  { ideologyLabel = 'Liberal';        ideologyColor = '#2a5a8c'; }
+    else if (s < 0.1)   { ideologyLabel = 'Moderate';       ideologyColor = '#7a5c00'; }
+    else if (s < 0.4)   { ideologyLabel = 'Conservative';   ideologyColor = '#8c2a1a'; }
+    else                { ideologyLabel = 'Very Conservative'; ideologyColor = '#c0392b'; }
+  }
+
+  // Bar color by party
+  const barColor = party === 'D' ? 'var(--blue)' : party === 'R' ? 'var(--red)' : 'var(--gold)';
+
+  // Stats cards
+  const statsHtml = `
+    <div class="votes-stats-grid">
+      <div class="votes-stat-card">
+        <label>Party-Line Votes</label>
+        <div class="votes-stat-val">${partyPct}</div>
+        <div class="votes-stat-sub">Voted with party</div>
+      </div>
+      <div class="votes-stat-card">
+        <label>Missed Votes</label>
+        <div class="votes-stat-val">${missedPct}</div>
+        <div class="votes-stat-sub">Of all votes</div>
+      </div>
+      <div class="votes-stat-card">
+        <label>Ideology Score</label>
+        <div class="votes-stat-val" style="font-size:1.1rem;color:${ideologyColor}">${ideologyLabel}</div>
+        <div class="votes-stat-sub">${ideology !== null ? `Score: ${ideology}` : 'Not available'}</div>
+      </div>
+      <div class="votes-stat-card">
+        <label>Leadership</label>
+        <div class="votes-stat-val">${leadership}</div>
+        <div class="votes-stat-sub">Influence score</div>
+      </div>
+    </div>`;
+
+  // Party-line bar
+  const partyBarPct = role?.party_line_votes_pct != null
+    ? (role.party_line_votes_pct * 100).toFixed(0) : null;
+  const barsHtml = partyBarPct !== null ? `
+    <div class="votes-bar-wrap">
+      <div class="votes-bar-label">Voting Alignment</div>
+      <div class="votes-bar-row">
+        <div class="votes-bar-name">With Party</div>
+        <div class="votes-bar-track"><div class="votes-bar-fill" style="width:${partyBarPct}%;background:${barColor}"></div></div>
+        <div class="votes-bar-pct">${partyBarPct}%</div>
+      </div>
+      <div class="votes-bar-row">
+        <div class="votes-bar-name">Against Party</div>
+        <div class="votes-bar-track"><div class="votes-bar-fill" style="width:${100-partyBarPct}%;background:var(--silver)"></div></div>
+        <div class="votes-bar-pct">${100-partyBarPct}%</div>
+      </div>
+    </div>` : '';
+
+  // Recent votes list
+  let votesListHtml = '';
+  if (recentVotes.length) {
+    const rows = recentVotes.slice(0, 15).map(v => {
+      const rawVote  = (v.memberVote || v.vote_cast || '').toLowerCase();
+      const voteClass = rawVote.includes('yea') || rawVote === 'yes' ? 'yea'
+                      : rawVote.includes('nay') || rawVote === 'no'  ? 'nay'
+                      : rawVote === 'present'                        ? 'present'
+                      : 'not-voting';
+      const voteLabel = rawVote.includes('yea') || rawVote === 'yes' ? 'YEA'
+                      : rawVote.includes('nay') || rawVote === 'no'  ? 'NAY'
+                      : rawVote === 'present'                        ? 'PRESENT'
+                      : 'NOT\nVOTING';
+      const resultRaw  = (v.result || '').toLowerCase();
+      const resultClass = resultRaw.includes('pass') || resultRaw.includes('agreed') ? 'passed'
+                        : resultRaw.includes('fail') || resultRaw.includes('reject') ? 'failed' : '';
+      const resultLabel = resultClass === 'passed' ? 'Passed' : resultClass === 'failed' ? 'Failed' : (v.result || '');
+      const desc = v.description || v.question || '—';
+      const date = v.date || v.voted_at || '';
+
+      return `<div class="vote-item">
+        <div><span class="vote-result ${voteClass}">${voteLabel}</span></div>
+        <div>
+          <div class="vote-desc">${desc.length > 120 ? desc.slice(0,120)+'…' : desc}</div>
+          <div class="vote-meta">${date}${v.rollNumber ? ` · Roll #${v.rollNumber}` : ''}</div>
+        </div>
+        <div class="vote-outcome ${resultClass}">${resultLabel}</div>
+      </div>`;
+    }).join('');
+
+    votesListHtml = `
+      <div class="votes-recent-header">
+        <div class="votes-recent-title">Recent Roll Call Votes</div>
+        <div class="votes-note">Most recent first · 119th Congress</div>
+      </div>
+      <div class="votes-list">${rows}</div>`;
+  }
+
+  el.innerHTML = `
+    ${statsHtml}
+    ${barsHtml}
+    ${votesListHtml}
+    <div class="votes-source">
+      Voting statistics from <a href="${govtrackUrl}" target="_blank">GovTrack.us ↗</a> ·
+      Roll call votes from <a href="https://www.congress.gov" target="_blank">Congress.gov</a> ·
+      <a href="https://clerk.house.gov/Votes" target="_blank">Official House Roll Calls</a> ·
+      <a href="https://www.senate.gov/legislative/votes_new.htm" target="_blank">Official Senate Roll Calls</a>
+    </div>`;
 }
 
 // ═══════════════════════════════════════════════════════
