@@ -1344,8 +1344,11 @@ function populateStateFilter() {
 
 // ═══════════════════════════════════════════════════════
 // VOTING RECORD
-// Uses GovTrack API for stats + Congress.gov house-vote API for roll calls
+// GovTrack API (CORS open, no key) for stats + recent votes
+// Congress.gov house-vote API (via proxy) for House roll calls
 // ═══════════════════════════════════════════════════════
+const GOVTRACK = 'https://www.govtrack.us/api/v2';
+
 async function loadVotes(member) {
   const el = document.getElementById('votes-content');
   el.innerHTML = `<div class="loading-state" style="padding:40px 20px">
@@ -1353,183 +1356,143 @@ async function loadVotes(member) {
     <div class="loading-text">Loading voting record…</div>
   </div>`;
 
-  const bioguide  = member.bioguideId;
-  const isHouse   = member.chamber === 'House';
-  const govtrackUrl = `https://www.govtrack.us/congress/members/${bioguide}`;
-
   try {
-    // ── Step 1: get GovTrack person ID from bioguide ─────────────────────────
+    // ── 1. Look up GovTrack person ID from bioguide ──────────────────────────
     const personRes = await fetch(
-      `https://www.govtrack.us/api/v2/person?bioguideid=${bioguide}&format=json`
+      `${GOVTRACK}/person?bioguideid=${member.bioguideId}&format=json`
     );
-    if (!personRes.ok) throw new Error('GovTrack person lookup failed');
+    if (!personRes.ok) throw new Error('GovTrack unavailable');
     const personData = await personRes.json();
     const person = personData.objects?.[0];
-    if (!person) throw new Error('Person not found in GovTrack');
+    if (!person) throw new Error('Member not found on GovTrack');
 
-    const personId = person.id;
+    // ── 2. Fetch current role (stats) and recent votes in parallel ───────────
+    const [roleRes, voteRes] = await Promise.all([
+      fetch(`${GOVTRACK}/role?person=${person.id}&current=true&format=json`),
+      fetch(`${GOVTRACK}/vote_voter?person=${person.id}&limit=25&order_by=-created&format=json`),
+    ]);
 
-    // ── Step 2: get current role (for party-line %, missed votes, ideology) ──
-    const roleRes = await fetch(
-      `https://www.govtrack.us/api/v2/role?person=${personId}&current=true&format=json`
-    );
-    const roleData = await roleRes.json();
-    const role = roleData.objects?.[0];
+    const role       = (await roleRes.json()).objects?.[0] || null;
+    const voteVoters = (await voteRes.json()).objects      || [];
 
-    // ── Step 3: recent votes (House only via Congress.gov; Senate via GovTrack)
-    let recentVotes = [];
-    if (isHouse) {
-      // Congress.gov house-vote member endpoint (beta, 118th+ Congress)
-      try {
-        const vRes = await apiFetch(
-          `/v3/member/${bioguide}/house-votes?limit=20&congress=119&sort=date+desc`
-        );
-        recentVotes = vRes?.votes || vRes?.houseVotes || [];
-      } catch(e) { /* fall through to GovTrack */ }
-    }
+    // ── 3. Enrich votes with question text ──────────────────────────────────
+    // vote_voter gives us the vote reference; we need vote.question from each
+    const votes = voteVoters.map(vv => ({
+      date:        vv.vote?.created?.slice(0, 10) || '—',
+      question:    vv.vote?.question || vv.vote?.description || '—',
+      category:    vv.vote?.category || '',
+      result:      vv.vote?.result   || '',
+      rollNumber:  vv.vote?.number   || '',
+      congress:    vv.vote?.congress || '',
+      chamber:     vv.vote?.chamber  || '',
+      voteChoice:  vv.option?.value  || '—',
+      voteUrl:     vv.vote?.id       ? `https://www.govtrack.us/congress/votes/${vv.vote.congress}-${vv.vote.chamber}/${vv.vote.number}` : null,
+    }));
 
-    // Fallback: GovTrack vote_voter for both chambers
-    if (!recentVotes.length) {
-      const vvRes = await fetch(
-        `https://www.govtrack.us/api/v2/vote_voter?person=${personId}&limit=20&order_by=-created&format=json`
-      );
-      const vvData = await vvRes.json();
-      recentVotes = (vvData.objects || []).map(v => ({
-        _source: 'govtrack',
-        date: v.vote?.created?.slice(0,10),
-        description: v.vote?.question || v.vote?.description || '—',
-        memberVote: v.option?.value,
-        result: v.vote?.result,
-        rollNumber: v.vote?.number,
-        congress: v.vote?.congress,
-      }));
-    }
-
-    renderVotes(el, member, person, role, recentVotes, govtrackUrl);
+    renderVotes(el, member, person, role, votes);
 
   } catch(err) {
     console.error('Vote load error:', err);
-    // Graceful fallback — show stats link
     el.innerHTML = `
-      <div class="votes-recent-header" style="margin-bottom:16px">
-        <div class="votes-recent-title">Voting Record</div>
-      </div>
-      <div class="trades-ct-card">
-        <div class="trades-ct-logo">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
-          </svg>
-          GovTrack Voting Record
+      <div class="votes-error">
+        <div style="font-family:var(--mono);font-size:0.78rem;color:var(--silver);padding:32px;text-align:center;background:white;border:1px solid var(--border)">
+          Voting data temporarily unavailable. GovTrack may be rate limiting requests.<br><br>
+          <a href="https://www.govtrack.us/congress/members/${member.bioguideId}" target="_blank" style="color:var(--blue)">
+            View full voting record on GovTrack ↗
+          </a>
         </div>
-        <div class="trades-ct-desc">
-          View ${member.name}'s full voting history, party-line voting percentage, missed votes, and ideology score on GovTrack.
-        </div>
-        <div class="trades-ct-links">
-          <a class="trades-ct-btn primary" href="${govtrackUrl}" target="_blank">View on GovTrack ↗</a>
-        </div>
-      </div>
-      <div class="votes-source">
-        Data from <a href="https://www.govtrack.us" target="_blank">GovTrack.us</a> ·
-        <a href="https://clerk.house.gov/Votes" target="_blank">Official House Roll Calls</a> ·
-        <a href="https://www.senate.gov/legislative/votes_new.htm" target="_blank">Official Senate Roll Calls</a>
       </div>`;
   }
 }
 
-function renderVotes(el, member, person, role, recentVotes, govtrackUrl) {
+function renderVotes(el, member, person, role, votes) {
   const party    = member.party;
-  const partyPct = role?.party_line_votes_pct != null
-    ? (role.party_line_votes_pct * 100).toFixed(1) + '%' : '—';
-  const missedPct = role?.missed_votes_pct != null
-    ? role.missed_votes_pct.toFixed(1) + '%' : '—';
-  const ideology = role?.ideology_score != null
-    ? role.ideology_score.toFixed(2) : null;
-  const leadership = role?.leadership_score != null
-    ? (role.leadership_score * 100).toFixed(0) + '%' : '—';
-
-  // Ideology label based on score (−1=far left, +1=far right)
-  let ideologyLabel = '—';
-  let ideologyColor = 'var(--silver)';
-  if (ideology !== null) {
-    const s = parseFloat(ideology);
-    if      (s < -0.4)  { ideologyLabel = 'Progressive';    ideologyColor = '#1a3a5c'; }
-    else if (s < -0.1)  { ideologyLabel = 'Liberal';        ideologyColor = '#2a5a8c'; }
-    else if (s < 0.1)   { ideologyLabel = 'Moderate';       ideologyColor = '#7a5c00'; }
-    else if (s < 0.4)   { ideologyLabel = 'Conservative';   ideologyColor = '#8c2a1a'; }
-    else                { ideologyLabel = 'Very Conservative'; ideologyColor = '#c0392b'; }
-  }
-
-  // Bar color by party
   const barColor = party === 'D' ? 'var(--blue)' : party === 'R' ? 'var(--red)' : 'var(--gold)';
 
-  // Stats cards
+  // ── Stats ────────────────────────────────────────────────────────────────
+  const partyPct   = role?.party_line_votes_pct != null ? (role.party_line_votes_pct * 100).toFixed(1) : null;
+  const missedPct  = role?.missed_votes_pct     != null ? role.missed_votes_pct.toFixed(1)             : null;
+  const ideology   = role?.ideology_score       != null ? parseFloat(role.ideology_score)              : null;
+  const leadership = role?.leadership_score     != null ? (role.leadership_score * 100).toFixed(0)     : null;
+
+  let ideologyLabel = '—', ideologyColor = 'var(--silver)';
+  if (ideology !== null) {
+    if      (ideology < -0.4) { ideologyLabel = 'Progressive';       ideologyColor = '#1a3a5c'; }
+    else if (ideology < -0.1) { ideologyLabel = 'Liberal';           ideologyColor = '#2a5a8c'; }
+    else if (ideology <  0.1) { ideologyLabel = 'Moderate';          ideologyColor = '#7a5c00'; }
+    else if (ideology <  0.4) { ideologyLabel = 'Conservative';      ideologyColor = '#8c2a1a'; }
+    else                      { ideologyLabel = 'Very Conservative';  ideologyColor = '#c0392b'; }
+  }
+
   const statsHtml = `
     <div class="votes-stats-grid">
       <div class="votes-stat-card">
-        <label>Party-Line Votes</label>
-        <div class="votes-stat-val">${partyPct}</div>
-        <div class="votes-stat-sub">Voted with party</div>
+        <label>With Party</label>
+        <div class="votes-stat-val">${partyPct !== null ? partyPct + '%' : '—'}</div>
+        <div class="votes-stat-sub">Party-line votes</div>
       </div>
       <div class="votes-stat-card">
         <label>Missed Votes</label>
-        <div class="votes-stat-val">${missedPct}</div>
-        <div class="votes-stat-sub">Of all votes</div>
+        <div class="votes-stat-val">${missedPct !== null ? missedPct + '%' : '—'}</div>
+        <div class="votes-stat-sub">Of all roll calls</div>
       </div>
       <div class="votes-stat-card">
-        <label>Ideology Score</label>
-        <div class="votes-stat-val" style="font-size:1.1rem;color:${ideologyColor}">${ideologyLabel}</div>
-        <div class="votes-stat-sub">${ideology !== null ? `Score: ${ideology}` : 'Not available'}</div>
+        <label>Ideology</label>
+        <div class="votes-stat-val" style="font-size:1rem;color:${ideologyColor};padding-top:4px">${ideologyLabel}</div>
+        <div class="votes-stat-sub">${ideology !== null ? 'Score: ' + ideology.toFixed(2) : 'Not available'}</div>
       </div>
       <div class="votes-stat-card">
         <label>Leadership</label>
-        <div class="votes-stat-val">${leadership}</div>
+        <div class="votes-stat-val">${leadership !== null ? leadership + '%' : '—'}</div>
         <div class="votes-stat-sub">Influence score</div>
       </div>
     </div>`;
 
-  // Party-line bar
-  const partyBarPct = role?.party_line_votes_pct != null
-    ? (role.party_line_votes_pct * 100).toFixed(0) : null;
-  const barsHtml = partyBarPct !== null ? `
+  // ── Alignment bars ───────────────────────────────────────────────────────
+  const barsHtml = partyPct !== null ? `
     <div class="votes-bar-wrap">
-      <div class="votes-bar-label">Voting Alignment</div>
+      <div class="votes-bar-label">Voting Alignment — Current Term</div>
       <div class="votes-bar-row">
         <div class="votes-bar-name">With Party</div>
-        <div class="votes-bar-track"><div class="votes-bar-fill" style="width:${partyBarPct}%;background:${barColor}"></div></div>
-        <div class="votes-bar-pct">${partyBarPct}%</div>
+        <div class="votes-bar-track"><div class="votes-bar-fill" style="width:${partyPct}%;background:${barColor}"></div></div>
+        <div class="votes-bar-pct">${partyPct}%</div>
       </div>
       <div class="votes-bar-row">
-        <div class="votes-bar-name">Against Party</div>
-        <div class="votes-bar-track"><div class="votes-bar-fill" style="width:${100-partyBarPct}%;background:var(--silver)"></div></div>
-        <div class="votes-bar-pct">${100-partyBarPct}%</div>
+        <div class="votes-bar-name">Cross-Party</div>
+        <div class="votes-bar-track"><div class="votes-bar-fill" style="width:${(100-partyPct).toFixed(1)}%;background:var(--silver)"></div></div>
+        <div class="votes-bar-pct">${(100 - partyPct).toFixed(1)}%</div>
       </div>
     </div>` : '';
 
-  // Recent votes list
+  // ── Recent votes list ─────────────────────────────────────────────────────
   let votesListHtml = '';
-  if (recentVotes.length) {
-    const rows = recentVotes.slice(0, 15).map(v => {
-      const rawVote  = (v.memberVote || v.vote_cast || '').toLowerCase();
-      const voteClass = rawVote.includes('yea') || rawVote === 'yes' ? 'yea'
-                      : rawVote.includes('nay') || rawVote === 'no'  ? 'nay'
-                      : rawVote === 'present'                        ? 'present'
-                      : 'not-voting';
-      const voteLabel = rawVote.includes('yea') || rawVote === 'yes' ? 'YEA'
-                      : rawVote.includes('nay') || rawVote === 'no'  ? 'NAY'
-                      : rawVote === 'present'                        ? 'PRESENT'
-                      : 'NOT\nVOTING';
-      const resultRaw  = (v.result || '').toLowerCase();
+  if (votes.length) {
+    const rows = votes.map(v => {
+      const raw   = (v.voteChoice || '').toLowerCase();
+      const cls   = raw.includes('yea') || raw === 'yes' ? 'yea'
+                  : raw.includes('nay') || raw === 'no'  ? 'nay'
+                  : raw === 'present'                    ? 'present'
+                  : 'not-voting';
+      const label = raw.includes('yea') || raw === 'yes' ? 'YEA'
+                  : raw.includes('nay') || raw === 'no'  ? 'NAY'
+                  : raw === 'present'                    ? 'PRES'
+                  : 'N/V';
+
+      const resultRaw   = (v.result || '').toLowerCase();
       const resultClass = resultRaw.includes('pass') || resultRaw.includes('agreed') ? 'passed'
                         : resultRaw.includes('fail') || resultRaw.includes('reject') ? 'failed' : '';
-      const resultLabel = resultClass === 'passed' ? 'Passed' : resultClass === 'failed' ? 'Failed' : (v.result || '');
-      const desc = v.description || v.question || '—';
-      const date = v.date || v.voted_at || '';
+      const resultLabel = resultClass === 'passed' ? 'Passed' : resultClass === 'failed' ? 'Failed' : v.result;
+
+      const desc = v.question.length > 110 ? v.question.slice(0, 110) + '…' : v.question;
+      const meta = [v.date, v.rollNumber ? `Roll #${v.rollNumber}` : '', v.chamber ? v.chamber.charAt(0).toUpperCase() + v.chamber.slice(1) : ''].filter(Boolean).join(' · ');
+
+      const link = v.voteUrl ? `<a href="${v.voteUrl}" target="_blank" style="font-family:var(--mono);font-size:0.6rem;color:var(--gold);margin-left:8px">↗</a>` : '';
 
       return `<div class="vote-item">
-        <div><span class="vote-result ${voteClass}">${voteLabel}</span></div>
+        <div><span class="vote-result ${cls}">${label}</span></div>
         <div>
-          <div class="vote-desc">${desc.length > 120 ? desc.slice(0,120)+'…' : desc}</div>
-          <div class="vote-meta">${date}${v.rollNumber ? ` · Roll #${v.rollNumber}` : ''}</div>
+          <div class="vote-desc">${desc}${link}</div>
+          <div class="vote-meta">${meta}</div>
         </div>
         <div class="vote-outcome ${resultClass}">${resultLabel}</div>
       </div>`;
@@ -1538,7 +1501,7 @@ function renderVotes(el, member, person, role, recentVotes, govtrackUrl) {
     votesListHtml = `
       <div class="votes-recent-header">
         <div class="votes-recent-title">Recent Roll Call Votes</div>
-        <div class="votes-note">Most recent first · 119th Congress</div>
+        <div class="votes-note">Most recent first</div>
       </div>
       <div class="votes-list">${rows}</div>`;
   }
@@ -1548,10 +1511,9 @@ function renderVotes(el, member, person, role, recentVotes, govtrackUrl) {
     ${barsHtml}
     ${votesListHtml}
     <div class="votes-source">
-      Voting statistics from <a href="${govtrackUrl}" target="_blank">GovTrack.us ↗</a> ·
-      Roll call votes from <a href="https://www.congress.gov" target="_blank">Congress.gov</a> ·
-      <a href="https://clerk.house.gov/Votes" target="_blank">Official House Roll Calls</a> ·
-      <a href="https://www.senate.gov/legislative/votes_new.htm" target="_blank">Official Senate Roll Calls</a>
+      Voting statistics and roll call data via <a href="https://www.govtrack.us/congress/members/${member.bioguideId}" target="_blank">GovTrack.us</a> ·
+      Official records: <a href="https://clerk.house.gov/Votes" target="_blank">House Clerk</a> ·
+      <a href="https://www.senate.gov/legislative/votes_new.htm" target="_blank">Senate</a>
     </div>`;
 }
 
