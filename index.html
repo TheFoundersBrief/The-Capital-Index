@@ -986,7 +986,10 @@ async function renderFinance(m) {
     const fecRes = await fetch(`${PROXY}${searchPath}`);
     if (fecRes.ok) {
       const fecJson = await fecRes.json();
-      const candidate = fecJson.results?.[0];
+      // Prefer active candidate (status C) with furthest active_through year
+      const candidates = fecJson.results || [];
+      const candidate = candidates.find(c => c.candidate_status === 'C')
+        || candidates.sort((a,b) => (b.active_through||0) - (a.active_through||0))[0];
       if (candidate) {
         const totPath = `/fec/v1/candidate/${candidate.candidate_id}/totals/?per_page=1&sort=-cycle`;
         const totRes = await fetch(`${PROXY}${totPath}`);
