@@ -273,6 +273,17 @@
   .trades-source { font-family: var(--mono); font-size: 0.6rem; color: var(--silver); line-height: 1.9; margin-top: 12px; }
   .trades-source a { color: var(--gold); }
 
+  .trades-ct-card { background: white; border: 1px solid var(--border); padding: 28px 32px; margin-bottom: 20px; }
+  .trades-ct-logo { display: flex; align-items: center; gap: 10px; font-family: var(--serif); font-size: 1.1rem; font-weight: 700; color: var(--ink); margin-bottom: 14px; }
+  .trades-ct-logo svg { color: var(--blue); }
+  .trades-ct-desc { font-family: var(--sans); font-size: 0.86rem; color: var(--silver); line-height: 1.7; margin-bottom: 22px; max-width: 580px; }
+  .trades-ct-links { display: flex; gap: 10px; flex-wrap: wrap; }
+  .trades-ct-btn { display: inline-block; padding: 11px 20px; font-family: var(--mono); font-size: 0.72rem; letter-spacing: 1px; text-transform: uppercase; text-decoration: none; transition: all 0.15s; }
+  .trades-ct-btn.primary { background: var(--blue); color: white; border: 1px solid var(--blue); }
+  .trades-ct-btn.primary:hover { background: #0f2a45; }
+  .trades-ct-btn.secondary { background: var(--cream); color: var(--ink); border: 1px solid var(--border); }
+  .trades-ct-btn.secondary:hover { border-color: var(--gold); background: white; }
+
   /* ── FOOTER ── */
   footer { background: var(--ink); color: #444; padding: 32px 40px; font-family: var(--mono); font-size: 0.68rem; line-height: 2.2; }
   .footer-inner { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: start; gap: 40px; flex-wrap: wrap; }
@@ -1245,11 +1256,7 @@ function closeModal() {
   document.body.style.overflow = '';
   currentMember = null;
   allBills = [];
-  document.getElementById('trades-content').innerHTML = `
-    <div class="loading-state" style="padding:40px 20px">
-      <div class="loading-spinner"></div>
-      <div class="loading-text">Loading stock disclosures…</div>
-    </div>`;
+  document.getElementById('trades-content').innerHTML = '';
 }
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
@@ -1377,122 +1384,51 @@ function clearZip() {
 }
 
 // ═══════════════════════════════════════════════════════
-// STOCK ACT TRADES (via House & Senate disclosure APIs)
+// STOCK ACT TRADES (via Capitol Trades + official sources)
 // ═══════════════════════════════════════════════════════
-const TRADES_API = 'https://house-stock-watcher-data.s3-us-west-2.amazonaws.com/data/all_transactions.json';
-const SENATE_TRADES_API = 'https://senate-stock-watcher-data.s3-us-west-2.amazonaws.com/aggregate/all_transactions.json';
-let tradesCache = null;   // full dataset cached after first fetch
-let senateTradesCache = null;
-
-async function loadTrades(member) {
+function loadTrades(member) {
   const el = document.getElementById('trades-content');
-  el.innerHTML = `<div class="loading-state" style="padding:40px 20px">
-    <div class="loading-spinner"></div>
-    <div class="loading-text">Loading STOCK Act disclosures…</div>
-  </div>`;
+  const bioguide = member.bioguideId;
+  const name     = member.name;
+  const isSenat  = member.chamber === 'Senate';
+  const ctUrl    = `https://www.capitoltrades.com/politicians/${bioguide}`;
 
-  try {
-    const isSenat = member.chamber === 'Senate';
-
-    if (isSenat) {
-      if (!senateTradesCache) {
-        const r = await fetch(SENATE_TRADES_API);
-        senateTradesCache = await r.json();
-      }
-      const cache = senateTradesCache;
-      // Senate data: array of objects with senator field
-      const name = member.name; // "First Last"
-      const [first, ...restArr] = name.split(' ');
-      const last = restArr.join(' ');
-      const trades = cache.filter(t => {
-        const sn = (t.senator || '').toLowerCase();
-        return sn.includes(last.toLowerCase());
-      }).slice(0, 50);
-      renderTradesTable(el, trades, member, 'senate');
-
-    } else {
-      if (!tradesCache) {
-        const r = await fetch(TRADES_API);
-        tradesCache = await r.json();
-      }
-      const name = member.name;
-      const [first, ...restArr] = name.split(' ');
-      const last = restArr.join(' ');
-      const trades = tradesCache.filter(t => {
-        const rep = (t.representative || '').toLowerCase();
-        return rep.includes(last.toLowerCase());
-      }).slice(0, 50);
-      renderTradesTable(el, trades, member, 'house');
-    }
-
-  } catch(err) {
-    el.innerHTML = `<div class="trades-empty">
-      Could not load disclosure data. The data source may be temporarily unavailable.
-    </div>`;
-    console.error(err);
-  }
-}
-
-function renderTradesTable(el, trades, member, source) {
-  if (!trades.length) {
-    el.innerHTML = `
-      <div class="trades-header">
-        <div class="trades-title">STOCK Act Disclosures</div>
-      </div>
-      <div class="trades-empty">No disclosed trades found for ${member.name}.</div>
-      <div class="trades-source">
-        Data: <a href="https://efts.house.gov/LATEST/search-index?q=%22${encodeURIComponent(member.name)}%22&dateRange=custom&startDate=2012-01-01" target="_blank">House Disclosures</a> ·
-        <a href="https://efts.senate.gov/LATEST/search-index?q=%22${encodeURIComponent(member.name)}%22" target="_blank">Senate Disclosures</a> ·
-        <a href="https://housestockwatcher.com" target="_blank">HouseStockWatcher</a> ·
-        <a href="https://senatestockwatcher.com" target="_blank">SenateStockWatcher</a>
-      </div>`;
-    return;
-  }
-
-  // Sort newest first
-  trades.sort((a,b) => new Date(b.transaction_date||b.date||0) - new Date(a.transaction_date||a.date||0));
-
-  const totalTrades = trades.length;
-  const rows = trades.map(t => {
-    const ticker   = t.ticker || '—';
-    const asset    = t.asset_description || t.asset_name || '';
-    const txType   = (t.type || t.transaction_type || '').toLowerCase();
-    const amount   = t.amount || '—';
-    const date     = t.transaction_date || t.date || '—';
-    const typeClass = txType.includes('purchase') ? 'purchase' : txType.includes('sale') || txType.includes('sell') ? 'sale' : 'exchange';
-    const typeLabel = txType.includes('purchase') ? 'Purchase' : txType.includes('sale') || txType.includes('sell') ? 'Sale' : txType || '—';
-    const late = t.filed_late === 'Yes' || t.comment?.toLowerCase().includes('late');
-    const lateFlag = late ? `<span class="trade-flag">LATE FILING</span>` : '';
-
-    return `<tr>
-      <td>${date}</td>
-      <td>
-        <div class="trade-ticker">${ticker === '--' ? '—' : ticker}${lateFlag}</div>
-        ${asset ? `<div class="trade-asset">${asset.slice(0,60)}${asset.length>60?'…':''}</div>` : ''}
-      </td>
-      <td><span class="trade-type ${typeClass}">${typeLabel}</span></td>
-      <td class="trade-amount">${amount}</td>
-    </tr>`;
-  }).join('');
+  // Official disclosure search URLs
+  const houseDiscUrl  = `https://disclosures-clerk.house.gov/FinancialDisclosure#Search`;
+  const senateDiscUrl = `https://efts.senate.gov/LATEST/search-index?q=%22${encodeURIComponent(name)}%22`;
+  const officialUrl   = isSenat ? senateDiscUrl : houseDiscUrl;
+  const officialLabel = isSenat ? 'Senate eFD Search' : 'House Disclosure Search';
 
   el.innerHTML = `
     <div class="trades-header">
       <div class="trades-title">STOCK Act Disclosures</div>
-      <div class="trades-meta">${totalTrades} transaction${totalTrades!==1?'s':''} disclosed · Most recent first</div>
+      <div class="trades-meta">Required by law · Amounts disclosed as ranges</div>
     </div>
-    <div style="overflow-x:auto">
-      <table class="trades-table">
-        <thead><tr>
-          <th>Date</th><th>Asset / Ticker</th><th>Type</th><th>Amount</th>
-        </tr></thead>
-        <tbody>${rows}</tbody>
-      </table>
+
+    <div class="trades-ct-card">
+      <div class="trades-ct-logo">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+        Capitol Trades
+      </div>
+      <div class="trades-ct-desc">
+        Capitol Trades aggregates all STOCK Act filings for every member of Congress — showing individual trades, filing dates, tickers, and amounts. It is the most comprehensive free resource for congressional trading data.
+      </div>
+      <div class="trades-ct-links">
+        <a class="trades-ct-btn primary" href="${ctUrl}" target="_blank">
+          View ${name}'s Trades on Capitol Trades ↗
+        </a>
+        <a class="trades-ct-btn secondary" href="${officialUrl}" target="_blank">
+          ${officialLabel} (Official) ↗
+        </a>
+      </div>
     </div>
+
     <div class="trades-source">
-      Required by the STOCK Act (2012). Amounts are disclosed as ranges (e.g. $1K–$15K). Late filings carry a $200 penalty.<br>
-      Source: <a href="https://housestockwatcher.com" target="_blank">HouseStockWatcher.com</a> ·
-      <a href="https://senatestockwatcher.com" target="_blank">SenateStockWatcher.com</a> ·
-      <a href="https://efts.house.gov/LATEST/search-index" target="_blank">Official House Disclosures</a>
+      The STOCK Act (2012) requires members of Congress to disclose securities transactions over $1,000 within 45 days.
+      Amounts are reported as ranges (e.g. $1K–$15K, $15K–$50K). Late filings incur a $200 penalty.<br>
+      Data compiled by <a href="https://www.capitoltrades.com" target="_blank">Capitol Trades / 2iQ Research</a> ·
+      Official filings: <a href="https://disclosures-clerk.house.gov" target="_blank">House</a> ·
+      <a href="https://efts.senate.gov" target="_blank">Senate</a>
     </div>`;
 }
 </script>
