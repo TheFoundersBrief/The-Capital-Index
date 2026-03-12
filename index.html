@@ -222,6 +222,10 @@
   .donors-table td.amt { font-family: var(--mono); font-weight: 500; text-align: right; }
   .donors-table td.pct { font-family: var(--mono); font-size: 0.72rem; color: var(--silver); text-align: right; }
   .finance-note { font-family: var(--mono); font-size: 0.6rem; color: var(--silver); margin-top: 14px; line-height: 1.9; }
+  .finance-ext-link { display:inline-flex; flex-direction:column; padding:14px 20px; border:1px solid var(--border); background:var(--cream); text-decoration:none; color:var(--ink); font-family:var(--mono); font-size:0.75rem; min-width:160px; transition:background 0.15s; }
+  .finance-ext-link:hover { background:white; border-color:var(--gold); }
+  .finance-ext-link strong { font-size:0.82rem; color:var(--blue); margin-bottom:3px; }
+  .finance-ext-link span { color:var(--silver); font-size:0.68rem; }
 
   /* ── CONTACT ── */
   .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; }
@@ -952,71 +956,102 @@ function renderBills(type) {
 // FINANCE PANEL
 // ═══════════════════════════════════════════════════════
 async function renderFinance(m) {
-  // Try FEC open API — free DEMO_KEY is heavily rate-limited;
-  // for production, add FEC_API_KEY to your Worker too
+  // Route FEC calls through Cloudflare Worker proxy
+  // Worker must handle /fec/* paths → https://api.open.fec.gov/v1/*
+  // Add FEC_API_KEY secret to Worker and update worker script to support /fec/ prefix
   let finData = null;
+
   try {
-    const fecRes = await fetch(
-      `https://api.open.fec.gov/v1/candidates/search/?name=${encodeURIComponent(m.lastName)}&office=${m.chamber==='Senate'?'S':'H'}&state=${m.state}&api_key=DEMO_KEY&per_page=5`
-    );
+    const searchPath = `/fec/v1/candidates/search/?name=${encodeURIComponent(m.lastName)}&office=${m.chamber==='Senate'?'S':'H'}&state=${m.state}&per_page=5`;
+    const fecRes = await fetch(`${PROXY}${searchPath}`);
     if (fecRes.ok) {
       const fecJson = await fecRes.json();
       const candidate = fecJson.results?.[0];
       if (candidate) {
-        const totRes = await fetch(
-          `https://api.open.fec.gov/v1/candidate/${candidate.candidate_id}/totals/?api_key=DEMO_KEY&per_page=1&sort=-cycle`
-        );
+        const totPath = `/fec/v1/candidate/${candidate.candidate_id}/totals/?per_page=1&sort=-cycle`;
+        const totRes = await fetch(`${PROXY}${totPath}`);
         if (totRes.ok) {
           const totJson = await totRes.json();
           const tot = totJson.results?.[0];
           if (tot) {
             finData = {
-              candidateId: candidate.candidate_id,
+              candidateId:  candidate.candidate_id,
+              name:         candidate.name,
               totalRaised:  fmtMoney(tot.receipts),
               cashOnHand:   fmtMoney(tot.cash_on_hand_end_period),
               totalSpent:   fmtMoney(tot.disbursements),
-              indivPct:     tot.receipts ? ((tot.individual_itemized_contributions||0)/tot.receipts*100).toFixed(1)+'%' : '—',
+              indivPct:     tot.receipts
+                ? ((tot.individual_itemized_contributions||0)/tot.receipts*100).toFixed(1)+'%'
+                : '—',
+              pacPct:       tot.receipts
+                ? ((tot.other_political_committee_contributions||0)/tot.receipts*100).toFixed(1)+'%'
+                : '—',
               cycle:        tot.cycle,
             };
           }
         }
       }
     }
-  } catch(e) { /* FEC unavailable, use estimates */ }
+  } catch(e) { /* Worker doesn't support /fec/ yet — show links */ }
 
+  // Finance summary cards
   const cards = finData ? [
-    { label:'Total Raised',    val: finData.totalRaised, note: `${finData.cycle} cycle` },
-    { label:'Cash on Hand',    val: finData.cashOnHand,  note: 'Latest filing' },
-    { label:'Total Spent',     val: finData.totalSpent,  note: `${finData.cycle} cycle` },
-    { label:'From Individuals',val: finData.indivPct,    note: '% of contributions' },
-  ] : [
-    { label:'Total Raised',    val: '—', note: 'FEC data unavailable' },
-    { label:'Cash on Hand',    val: '—', note: 'FEC data unavailable' },
-    { label:'Total Spent',     val: '—', note: 'FEC data unavailable' },
-    { label:'From Individuals',val: '—', note: 'FEC data unavailable' },
-  ];
+    { label: 'Total Raised',     val: finData.totalRaised, note: `${finData.cycle} cycle` },
+    { label: 'Cash on Hand',     val: finData.cashOnHand,  note: 'Latest filing' },
+    { label: 'Total Spent',      val: finData.totalSpent,  note: `${finData.cycle} cycle` },
+    { label: 'From Individuals', val: finData.indivPct,    note: '% of total raised' },
+    { label: 'From PACs',        val: finData.pacPct,      note: '% of total raised' },
+    { label: 'FEC Candidate ID', val: finData.candidateId, note: 'Federal Election Commission' },
+  ] : [];
 
-  document.getElementById('finance-grid').innerHTML =
-    cards.map(c => `
-      <div class="finance-card">
-        <label>${c.label}</label>
-        <div class="finance-amount">${c.val}</div>
-        <div class="finance-cycle">${c.note}</div>
-      </div>`).join('');
+  const fecSearchUrl  = `https://www.fec.gov/data/search/?query=${encodeURIComponent(m.name)}&data_type=processed`;
+  const fecNameUrl    = finData ? `https://www.fec.gov/data/candidate/${finData.candidateId}/` : fecSearchUrl;
+  const opensecUrl    = `https://www.opensecrets.org/members-of-congress/summary?name=${encodeURIComponent(m.name)}`;
+  const govtrackUrl   = `https://www.govtrack.us/congress/members/${m.bioguideId}`;
 
-  // Donor table — link to OpenSecrets / FEC if available
-  const fecId = finData?.candidateId;
+  document.getElementById('finance-grid').innerHTML = cards.length
+    ? cards.map(c => `
+        <div class="finance-card">
+          <label>${c.label}</label>
+          <div class="finance-amount">${c.val}</div>
+          <div class="finance-cycle">${c.note}</div>
+        </div>`).join('')
+    : `<div style="grid-column:1/-1;padding:28px 0 8px;font-family:var(--mono);font-size:0.8rem;color:var(--silver);line-height:1.8">
+        <strong style="color:var(--ink);font-size:0.85rem">Live FEC data requires a Worker update.</strong><br>
+        To enable: get a free API key at <a href="https://api.data.gov/signup/" target="_blank" style="color:var(--blue)">api.data.gov/signup</a>,
+        add it as <code>FEC_API_KEY</code> in your Cloudflare Worker, and update the Worker script to proxy
+        <code>/fec/*</code> paths to <code>https://api.open.fec.gov/v1/*</code>.<br><br>
+        In the meantime, full campaign finance data is one click away:
+      </div>`;
+
+  // External links — always shown
   document.getElementById('donors-body').innerHTML = `
-    <tr><td colspan="5" style="text-align:center;padding:28px;font-family:var(--mono);font-size:0.75rem;color:var(--silver)">
-      Detailed donor breakdowns are available on FEC.gov and OpenSecrets.org.<br><br>
-      ${fecId ? `<a href="https://www.fec.gov/data/candidate/${fecId}/" target="_blank" style="color:var(--blue);margin-right:16px">View on FEC.gov ↗</a>` : ''}
-      <a href="https://www.opensecrets.org/members-of-congress?name=${encodeURIComponent(m.name)}" target="_blank" style="color:var(--blue)">View on OpenSecrets ↗</a>
-    </td></tr>`;
+    <tr>
+      <td colspan="5" style="padding:20px 0">
+        <div style="display:flex;flex-wrap:wrap;gap:10px">
+          <a href="${fecNameUrl}" target="_blank" class="finance-ext-link">
+            <strong>FEC.gov</strong><br>
+            <span>Official filings, donors, PACs</span>
+          </a>
+          <a href="${opensecUrl}" target="_blank" class="finance-ext-link">
+            <strong>OpenSecrets</strong><br>
+            <span>Industry breakdown, top donors</span>
+          </a>
+          <a href="${govtrackUrl}" target="_blank" class="finance-ext-link">
+            <strong>GovTrack</strong><br>
+            <span>Voting record & analysis</span>
+          </a>
+          <a href="https://ballotpedia.org/Special:Search?search=${encodeURIComponent(m.name)}" target="_blank" class="finance-ext-link">
+            <strong>Ballotpedia</strong><br>
+            <span>Election history & biography</span>
+          </a>
+        </div>
+      </td>
+    </tr>`;
 
   document.getElementById('finance-note').innerHTML =
-    '* Financial data sourced from FEC.gov public disclosures.<br>' +
-    '* For complete donor lists and industry breakdowns, visit OpenSecrets.org or FEC.gov.<br>' +
-    (fecId ? `* FEC Candidate ID: ${fecId}` : '');
+    '* Live FEC data is proxied through the Cloudflare Worker when <code>FEC_API_KEY</code> is configured.<br>' +
+    '* All external links open official public data sources.';
 }
 
 // ═══════════════════════════════════════════════════════
