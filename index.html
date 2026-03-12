@@ -235,6 +235,44 @@
   .contact-item a:hover { text-decoration: underline; }
   .contact-item span { font-family: var(--sans); font-size: 0.86rem; color: var(--ink); }
 
+
+  /* ── ZIP LOOKUP ── */
+  .zip-banner { background: var(--blue); border-bottom: 3px solid var(--gold); padding: 0; overflow: hidden; max-height: 0; transition: max-height 0.4s ease, padding 0.4s ease; }
+  .zip-banner.open { max-height: 120px; padding: 18px 40px; }
+  .zip-banner-inner { max-width: 1400px; margin: 0 auto; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .zip-banner-label { font-family: var(--mono); font-size: 0.72rem; letter-spacing: 1.5px; text-transform: uppercase; color: #7a9cc0; white-space: nowrap; }
+  .zip-input-wrap { display: flex; gap: 8px; flex: 1; max-width: 340px; }
+  .zip-input { flex: 1; padding: 9px 14px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; font-family: var(--mono); font-size: 0.85rem; letter-spacing: 2px; outline: none; }
+  .zip-input::placeholder { color: rgba(255,255,255,0.3); }
+  .zip-input:focus { border-color: var(--gold); background: rgba(255,255,255,0.15); }
+  .zip-btn { padding: 9px 18px; background: var(--gold); border: none; color: var(--ink); font-family: var(--mono); font-size: 0.72rem; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; white-space: nowrap; transition: opacity 0.15s; }
+  .zip-btn:hover { opacity: 0.85; }
+  .zip-result { font-family: var(--mono); font-size: 0.72rem; color: #aac4e0; flex: 1; min-width: 200px; line-height: 1.7; }
+  .zip-clear { font-family: var(--mono); font-size: 0.68rem; color: var(--gold); cursor: pointer; text-decoration: underline; text-underline-offset: 2px; white-space: nowrap; }
+  .zip-clear:hover { color: white; }
+  .zip-toggle { font-family: var(--mono); font-size: 0.68rem; letter-spacing: 1px; text-transform: uppercase; color: #7a9cc0; cursor: pointer; padding: 8px 16px; border: 1px solid rgba(255,255,255,0.15); transition: all 0.15s; white-space: nowrap; }
+  .zip-toggle:hover, .zip-toggle.active { color: white; border-color: var(--gold); }
+
+  /* ── STOCK ACT ── */
+  .trades-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 10px; }
+  .trades-title { font-family: var(--serif); font-size: 1.1rem; font-weight: 700; }
+  .trades-meta { font-family: var(--mono); font-size: 0.65rem; color: var(--silver); }
+  .trades-table { width: 100%; border-collapse: collapse; margin-bottom: 14px; }
+  .trades-table th { font-family: var(--mono); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1px; color: var(--silver); text-align: left; padding: 9px 12px; background: var(--cream); border-bottom: 2px solid var(--border); white-space: nowrap; }
+  .trades-table td { padding: 10px 12px; font-family: var(--sans); font-size: 0.82rem; border-bottom: 1px solid var(--border); background: white; vertical-align: top; }
+  .trades-table tr:last-child td { border-bottom: none; }
+  .trade-ticker { font-family: var(--mono); font-weight: 600; color: var(--blue); font-size: 0.82rem; }
+  .trade-asset { font-size: 0.78rem; color: var(--silver); font-family: var(--mono); margin-top: 2px; }
+  .trade-type { font-family: var(--mono); font-size: 0.65rem; padding: 2px 7px; text-transform: uppercase; letter-spacing: 1px; display: inline-block; }
+  .trade-type.purchase { background: #e0f5e8; color: #1a5c2a; }
+  .trade-type.sale { background: #fde8e6; color: var(--red); }
+  .trade-type.exchange { background: #fff8e0; color: #7a5c00; }
+  .trade-amount { font-family: var(--mono); font-size: 0.78rem; color: var(--ink); }
+  .trade-flag { display: inline-block; padding: 2px 6px; font-family: var(--mono); font-size: 0.58rem; background: #fff3cd; color: #7a5c00; border: 1px solid #ffe08a; margin-left: 6px; vertical-align: middle; }
+  .trades-empty { padding: 40px; text-align: center; font-family: var(--mono); font-size: 0.75rem; color: var(--silver); background: white; border: 1px solid var(--border); }
+  .trades-source { font-family: var(--mono); font-size: 0.6rem; color: var(--silver); line-height: 1.9; margin-top: 12px; }
+  .trades-source a { color: var(--gold); }
+
   /* ── FOOTER ── */
   footer { background: var(--ink); color: #444; padding: 32px 40px; font-family: var(--mono); font-size: 0.68rem; line-height: 2.2; }
   .footer-inner { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: start; gap: 40px; flex-wrap: wrap; }
@@ -294,9 +332,24 @@
       <div class="nav-tab" data-view="R" onclick="setView('R',this)">Republican</div>
       <div class="nav-tab" data-view="I" onclick="setView('I',this)">Independent</div>
     </div>
-    <div class="nav-right" id="nav-status">Loading…</div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <div class="zip-toggle" id="zip-toggle" onclick="toggleZip()" title="Find your representatives">📍 My Reps</div>
+      <div class="nav-right" id="nav-status">Loading…</div>
+    </div>
   </div>
 </nav>
+
+<div class="zip-banner" id="zip-banner">
+  <div class="zip-banner-inner">
+    <div class="zip-banner-label">Find My Reps</div>
+    <div class="zip-input-wrap">
+      <input class="zip-input" id="zip-input" type="text" maxlength="5" placeholder="Enter ZIP code" oninput="this.value=this.value.replace(/[^0-9]/g,'')" onkeydown="if(event.key==='Enter')lookupZip()">
+      <button class="zip-btn" onclick="lookupZip()">Search</button>
+    </div>
+    <div class="zip-result" id="zip-result"></div>
+    <div class="zip-clear" id="zip-clear" style="display:none" onclick="clearZip()">✕ Clear</div>
+  </div>
+</div>
 
 <main>
   <div class="container">
@@ -363,6 +416,7 @@
       <div class="profile-tab active" onclick="switchTab('overview',this)">Overview</div>
       <div class="profile-tab" onclick="switchTab('bills',this)">Legislation</div>
       <div class="profile-tab" onclick="switchTab('finance',this)">Campaign Finance</div>
+      <div class="profile-tab" onclick="switchTab('trades',this)">Stock Trades</div>
       <div class="profile-tab" onclick="switchTab('contact',this)">Contact &amp; Links</div>
     </div>
 
@@ -399,6 +453,15 @@
           </table>
         </div>
         <div class="finance-note" id="finance-note"></div>
+      </div>
+
+      <div class="profile-panel" id="panel-trades">
+        <div id="trades-content">
+          <div class="loading-state" style="padding:40px 20px">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">Loading stock disclosures…</div>
+          </div>
+        </div>
       </div>
 
       <div class="profile-panel" id="panel-contact">
@@ -1153,6 +1216,10 @@ function switchTab(name, el) {
   document.querySelectorAll('.profile-panel').forEach(p => p.classList.remove('active'));
   document.getElementById('panel-' + name).classList.add('active');
 
+  if (name === 'trades' && currentMember) {
+    loadTrades(currentMember);
+    return;
+  }
   if (name === 'bills' && currentMember) {
     const activeBillBtn = document.querySelector('.bills-filter-btn.active');
     const type = activeBillBtn ? activeBillBtn.textContent.toLowerCase().replace('-','') : 'all';
@@ -1178,6 +1245,11 @@ function closeModal() {
   document.body.style.overflow = '';
   currentMember = null;
   allBills = [];
+  document.getElementById('trades-content').innerHTML = `
+    <div class="loading-state" style="padding:40px 20px">
+      <div class="loading-spinner"></div>
+      <div class="loading-text">Loading stock disclosures…</div>
+    </div>`;
 }
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
@@ -1214,6 +1286,214 @@ function populateStateFilter() {
   Object.entries(STATE_NAMES).slice(0,50).forEach(([code, name]) => {
     sel.innerHTML += `<option value="${code}">${name}</option>`;
   });
+}
+
+// ═══════════════════════════════════════════════════════
+// ZIP CODE LOOKUP
+// ═══════════════════════════════════════════════════════
+let zipState = null; // current ZIP lookup state
+
+function toggleZip() {
+  const banner = document.getElementById('zip-banner');
+  const toggle = document.getElementById('zip-toggle');
+  const isOpen = banner.classList.toggle('open');
+  toggle.classList.toggle('active', isOpen);
+  if (isOpen) setTimeout(() => document.getElementById('zip-input').focus(), 350);
+}
+
+async function lookupZip() {
+  const zip = document.getElementById('zip-input').value.trim();
+  if (zip.length !== 5) {
+    document.getElementById('zip-result').textContent = 'Please enter a 5-digit ZIP code.';
+    return;
+  }
+  const resultEl = document.getElementById('zip-result');
+  resultEl.textContent = 'Looking up…';
+
+  try {
+    // Census geocoding API: ZIP → state + congressional district
+    const geoUrl = `https://geocoding.geo.census.gov/geocoder/geographies/address?street=&city=&state=&zip=${zip}&benchmark=Public_AR_Current&vintage=Current_Current&layers=Congressional+Districts&format=json`;
+    const res = await fetch(geoUrl);
+    const data = await res.json();
+    const addrMatches = data?.result?.addressMatches;
+
+    if (!addrMatches?.length) {
+      resultEl.textContent = `ZIP ${zip} not found. Try another.`;
+      return;
+    }
+
+    const geo = addrMatches[0].geographies;
+    const stateCode = addrMatches[0].addressComponents?.state;
+    const districts = geo?.['Congressional Districts'] || geo?.['116th Congressional Districts'] || [];
+    const district = districts[0];
+    const districtNum = district ? parseInt(district.BASENAME) : null;
+
+    if (!stateCode) {
+      resultEl.textContent = 'Could not determine state from ZIP.';
+      return;
+    }
+
+    zipState = { stateCode, districtNum };
+
+    // Filter members grid to show: 2 senators + the house rep
+    filtered = allMembers.filter(m => {
+      if (m.state !== stateCode) return false;
+      if (m.chamber === 'Senate') return true;
+      // House: match district number (at-large = district 0 or 1)
+      if (districtNum !== null) {
+        const mDist = parseInt(m.district) || 0;
+        return mDist === districtNum || mDist === 0;
+      }
+      return true;
+    });
+
+    currentPage = 1;
+    renderGrid();
+    renderPagination();
+
+    const stateFull = stateName(stateCode);
+    const distLabel = districtNum ? `, District ${districtNum}` : ' (At-Large)';
+    const count = filtered.length;
+    resultEl.innerHTML = `Showing <strong style="color:white">${count} rep${count!==1?'s':''}</strong> for ZIP ${zip} · ${stateFull}${distLabel}`;
+    document.getElementById('zip-clear').style.display = 'inline';
+    document.getElementById('section-title').textContent = `Your Representatives — ZIP ${zip}`;
+
+  } catch(err) {
+    resultEl.textContent = 'Lookup failed. Check your connection and try again.';
+    console.error(err);
+  }
+}
+
+function clearZip() {
+  zipState = null;
+  document.getElementById('zip-input').value = '';
+  document.getElementById('zip-result').textContent = '';
+  document.getElementById('zip-clear').style.display = 'none';
+  document.getElementById('section-title').textContent = 'All Members of Congress';
+  filtered = [...allMembers];
+  currentPage = 1;
+  renderGrid();
+  renderPagination();
+}
+
+// ═══════════════════════════════════════════════════════
+// STOCK ACT TRADES (via House & Senate disclosure APIs)
+// ═══════════════════════════════════════════════════════
+const TRADES_API = 'https://house-stock-watcher-data.s3-us-west-2.amazonaws.com/data/all_transactions.json';
+const SENATE_TRADES_API = 'https://senate-stock-watcher-data.s3-us-west-2.amazonaws.com/aggregate/all_transactions.json';
+let tradesCache = null;   // full dataset cached after first fetch
+let senateTradesCache = null;
+
+async function loadTrades(member) {
+  const el = document.getElementById('trades-content');
+  el.innerHTML = `<div class="loading-state" style="padding:40px 20px">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">Loading STOCK Act disclosures…</div>
+  </div>`;
+
+  try {
+    const isSenat = member.chamber === 'Senate';
+
+    if (isSenat) {
+      if (!senateTradesCache) {
+        const r = await fetch(SENATE_TRADES_API);
+        senateTradesCache = await r.json();
+      }
+      const cache = senateTradesCache;
+      // Senate data: array of objects with senator field
+      const name = member.name; // "First Last"
+      const [first, ...restArr] = name.split(' ');
+      const last = restArr.join(' ');
+      const trades = cache.filter(t => {
+        const sn = (t.senator || '').toLowerCase();
+        return sn.includes(last.toLowerCase());
+      }).slice(0, 50);
+      renderTradesTable(el, trades, member, 'senate');
+
+    } else {
+      if (!tradesCache) {
+        const r = await fetch(TRADES_API);
+        tradesCache = await r.json();
+      }
+      const name = member.name;
+      const [first, ...restArr] = name.split(' ');
+      const last = restArr.join(' ');
+      const trades = tradesCache.filter(t => {
+        const rep = (t.representative || '').toLowerCase();
+        return rep.includes(last.toLowerCase());
+      }).slice(0, 50);
+      renderTradesTable(el, trades, member, 'house');
+    }
+
+  } catch(err) {
+    el.innerHTML = `<div class="trades-empty">
+      Could not load disclosure data. The data source may be temporarily unavailable.
+    </div>`;
+    console.error(err);
+  }
+}
+
+function renderTradesTable(el, trades, member, source) {
+  if (!trades.length) {
+    el.innerHTML = `
+      <div class="trades-header">
+        <div class="trades-title">STOCK Act Disclosures</div>
+      </div>
+      <div class="trades-empty">No disclosed trades found for ${member.name}.</div>
+      <div class="trades-source">
+        Data: <a href="https://efts.house.gov/LATEST/search-index?q=%22${encodeURIComponent(member.name)}%22&dateRange=custom&startDate=2012-01-01" target="_blank">House Disclosures</a> ·
+        <a href="https://efts.senate.gov/LATEST/search-index?q=%22${encodeURIComponent(member.name)}%22" target="_blank">Senate Disclosures</a> ·
+        <a href="https://housestockwatcher.com" target="_blank">HouseStockWatcher</a> ·
+        <a href="https://senatestockwatcher.com" target="_blank">SenateStockWatcher</a>
+      </div>`;
+    return;
+  }
+
+  // Sort newest first
+  trades.sort((a,b) => new Date(b.transaction_date||b.date||0) - new Date(a.transaction_date||a.date||0));
+
+  const totalTrades = trades.length;
+  const rows = trades.map(t => {
+    const ticker   = t.ticker || '—';
+    const asset    = t.asset_description || t.asset_name || '';
+    const txType   = (t.type || t.transaction_type || '').toLowerCase();
+    const amount   = t.amount || '—';
+    const date     = t.transaction_date || t.date || '—';
+    const typeClass = txType.includes('purchase') ? 'purchase' : txType.includes('sale') || txType.includes('sell') ? 'sale' : 'exchange';
+    const typeLabel = txType.includes('purchase') ? 'Purchase' : txType.includes('sale') || txType.includes('sell') ? 'Sale' : txType || '—';
+    const late = t.filed_late === 'Yes' || t.comment?.toLowerCase().includes('late');
+    const lateFlag = late ? `<span class="trade-flag">LATE FILING</span>` : '';
+
+    return `<tr>
+      <td>${date}</td>
+      <td>
+        <div class="trade-ticker">${ticker === '--' ? '—' : ticker}${lateFlag}</div>
+        ${asset ? `<div class="trade-asset">${asset.slice(0,60)}${asset.length>60?'…':''}</div>` : ''}
+      </td>
+      <td><span class="trade-type ${typeClass}">${typeLabel}</span></td>
+      <td class="trade-amount">${amount}</td>
+    </tr>`;
+  }).join('');
+
+  el.innerHTML = `
+    <div class="trades-header">
+      <div class="trades-title">STOCK Act Disclosures</div>
+      <div class="trades-meta">${totalTrades} transaction${totalTrades!==1?'s':''} disclosed · Most recent first</div>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="trades-table">
+        <thead><tr>
+          <th>Date</th><th>Asset / Ticker</th><th>Type</th><th>Amount</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+    <div class="trades-source">
+      Required by the STOCK Act (2012). Amounts are disclosed as ranges (e.g. $1K–$15K). Late filings carry a $200 penalty.<br>
+      Source: <a href="https://housestockwatcher.com" target="_blank">HouseStockWatcher.com</a> ·
+      <a href="https://senatestockwatcher.com" target="_blank">SenateStockWatcher.com</a> ·
+      <a href="https://efts.house.gov/LATEST/search-index" target="_blank">Official House Disclosures</a>
+    </div>`;
 }
 </script>
 </body>
