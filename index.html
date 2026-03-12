@@ -868,9 +868,9 @@ function renderOverview(m) {
     { label: 'Party',           val: partyFull(m.party),                     sub: '' },
     { label: 'Chamber',         val: m.chamber,                              sub: '' },
     { label: 'In Office Since', val: m.startDate ? m.startDate.substring(0,4) : '—', sub: m.startDate || '' },
-    { label: 'Term Ends',       val: m.endDate   ? m.endDate.substring(0,4)   : '—', sub: '' },
+    { label: 'Term Ends',       val: m.termEnd || '—',                       sub: '' },
     { label: 'Next Election',   val: m.nextElection || '—',                  sub: '' },
-    { label: 'Years in Office', val: m.yearsInOffice ? m.yearsInOffice + ' yrs' : '—', sub: '' },
+    { label: 'Years in Office', val: m.startDate ? (new Date().getFullYear() - parseInt(m.startDate)) + ' yrs' : (m.yearsInOffice ? m.yearsInOffice + ' yrs' : '—'), sub: '' },
     { label: 'District',        val: m.district || (m.chamber === 'Senate' ? 'State-Wide' : '—'), sub: '' },
     { label: 'Sponsored Bills', val: allBills.filter(b=>b.role==='sponsored').length || '—', sub: 'Via Congress.gov' },
   ];
