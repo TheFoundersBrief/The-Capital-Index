@@ -506,24 +506,22 @@ function normalizeCongressMember(m) {
   const chamber = latestTerm.chamber || '';
   const isSenat = chamber.toLowerCase().includes('senate');
 
-  // Party
-  const partyHistory = m.partyHistory || [];
-  const currentParty = partyHistory[partyHistory.length - 1]?.partyAbbreviation || '?';
+  // Party — API returns partyName as full word e.g. "Republican", "Democratic"
+  const partyRaw = m.partyName || '';
 
   // State
   const addressInfo = m.addressInformation || {};
-  const state = m.state || latestTerm.stateCode || '';
 
   return {
     id:          m.bioguideId,
-    name:        m.invertedOrderName ? invertName(m.invertedOrderName) : (m.directOrderName || ''),
-    firstName:   (m.directOrderName || '').split(' ')[0] || '',
-    lastName:    m.invertedOrderName ? m.invertedOrderName.split(',')[0].trim() : '',
-    party:       normalizeParty(currentParty),
-    partyRaw:    currentParty,
-    state:       state,
+    name:        m.name ? invertName(m.name) : '',
+    firstName:   m.name ? (m.name.split(',')[1]?.trim().split(' ')[0] || '') : '',
+    lastName:    m.name ? m.name.split(',')[0].trim() : '',
+    party:       normalizeParty(partyRaw),
+    partyRaw:    partyRaw,
+    state:       m.state || latestTerm.stateCode || '',
     chamber:     isSenat ? 'Senate' : 'House',
-    district:    latestTerm.district || null,
+    district:    m.district || latestTerm.district || null,
     title:       isSenat ? 'Senator' : 'Representative',
     startDate:   latestTerm.startYear ? String(latestTerm.startYear) : '',
     endDate:     latestTerm.endYear   ? String(latestTerm.endYear)   : '',
