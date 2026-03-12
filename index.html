@@ -1008,11 +1008,12 @@ async function renderFinance(m) {
       const candidate = candidates.find(c => c.candidate_status === 'C')
         || candidates.sort((a,b) => (b.active_through||0) - (a.active_through||0))[0];
       if (candidate) {
-        const totPath = `/fec/v1/candidate/${candidate.candidate_id}/totals/?per_page=1&sort=-cycle`;
+        const totPath = `/fec/v1/candidate/${candidate.candidate_id}/totals/?per_page=10&sort=-cycle`;
         const totRes = await fetch(`${PROXY}${totPath}`);
         if (totRes.ok) {
           const totJson = await totRes.json();
-          const tot = totJson.results?.[0];
+          // Pick the most recent result that has actual receipts data
+          const tot = (totJson.results || []).find(t => t.receipts > 0 && t.cycle) || totJson.results?.[0];
           if (tot) {
             finData = {
               candidateId:  candidate.candidate_id,
@@ -1036,9 +1037,9 @@ async function renderFinance(m) {
 
   // Finance summary cards
   const cards = finData ? [
-    { label: 'Total Raised',     val: finData.totalRaised, note: `${finData.cycle} cycle` },
+    { label: 'Total Raised',     val: finData.totalRaised, note: finData.cycle ? `${finData.cycle} cycle` : 'Latest filing' },
     { label: 'Cash on Hand',     val: finData.cashOnHand,  note: 'Latest filing' },
-    { label: 'Total Spent',      val: finData.totalSpent,  note: `${finData.cycle} cycle` },
+    { label: 'Total Spent',      val: finData.totalSpent,  note: finData.cycle ? `${finData.cycle} cycle` : 'Latest filing' },
     { label: 'From Individuals', val: finData.indivPct,    note: '% of total raised' },
     { label: 'From PACs',        val: finData.pacPct,      note: '% of total raised' },
     { label: 'FEC Candidate ID', val: finData.candidateId, note: 'Federal Election Commission' },
