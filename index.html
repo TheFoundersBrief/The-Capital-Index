@@ -105,6 +105,10 @@
   .member-card.R::before { background: var(--red); }
   .member-card.I::before { background: var(--gold); }
   .member-card:hover { transform: translateY(-3px); box-shadow: 0 10px 28px rgba(0,0,0,0.12); z-index: 1; }
+  .member-card-top { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 14px; }
+  .member-photo { width: 60px; height: 72px; object-fit: cover; object-position: top; border: 1px solid var(--border); flex-shrink: 0; }
+  .member-photo-placeholder { width: 60px; height: 72px; background: var(--cream); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-family: var(--serif); font-size: 1.1rem; color: var(--silver); flex-shrink: 0; }
+  .member-card-top-info { flex: 1; min-width: 0; }
 
   .member-party-badge {
     display: inline-block; padding: 2px 8px; font-family: var(--mono);
@@ -525,7 +529,8 @@ function normalizeCongressMember(m) {
     title:       isSenat ? 'Senator' : 'Representative',
     startDate:   latestTerm.startYear ? String(latestTerm.startYear) : '',
     endDate:     latestTerm.endYear   ? String(latestTerm.endYear)   : '',
-    nextElection: latestTerm.endYear  ? String(latestTerm.endYear)   : '',
+    termEnd:     calcTermEnd(isSenat, latestTerm.startYear),
+    nextElection: calcTermEnd(isSenat, latestTerm.startYear),
     senateClass: latestTerm.stateCode ? null : null,
     website:     m.officialWebsiteUrl || '',
     depiction:   m.depiction?.imageUrl || null,
@@ -547,6 +552,29 @@ function invertName(inv) {
   const parts = inv.split(',');
   if (parts.length < 2) return inv;
   return `${parts[1].trim()} ${parts[0].trim()}`;
+}
+
+function calcTermEnd(isSenator, startYear) {
+  if (!startYear) return '—';
+  const start = parseInt(startYear);
+  if (isSenator) {
+    // Senate terms are 6 years; elections on even years
+    // Find next election year >= start+4 that is divisible by 2
+    let end = start + 6;
+    // Snap to even year
+    if (end % 2 !== 0) end++;
+    // Make sure it's in the future if possible
+    const thisYear = new Date().getFullYear();
+    while (end < thisYear) end += 6;
+    return String(end);
+  } else {
+    // House terms are 2 years, elections every even year
+    let end = start + 2;
+    if (end % 2 !== 0) end++;
+    const thisYear = new Date().getFullYear();
+    while (end < thisYear) end += 2;
+    return String(end);
+  }
 }
 
 function normalizeParty(raw) {
@@ -621,16 +649,21 @@ function renderGrid() {
 
   grid.innerHTML = slice.map(m => `
     <div class="member-card ${m.party}" onclick="openProfile('${m.id}')">
-      <div class="member-party-badge ${m.party}">${partyLabel(m.party)}</div>
-      <div class="member-name">${m.name}</div>
-      <div class="member-role">
-        ${m.title} · ${m.state}${m.district ? ', District ' + m.district : ''}
+      <div class="member-card-top">
+        ${m.depiction
+          ? `<img class="member-photo" src="${m.depiction}" alt="${m.name}" onerror="this.style.display='none'">`
+          : `<div class="member-photo-placeholder">${m.firstName?m.firstName[0]:'?'}${m.lastName?m.lastName[0]:''}</div>`}
+        <div class="member-card-top-info">
+          <div class="member-party-badge ${m.party}">${partyLabel(m.party)}</div>
+          <div class="member-name">${m.name}</div>
+          <div class="member-role">${m.title} · ${m.state}${m.district ? ' Dist. ' + m.district : ''}</div>
+        </div>
       </div>
       <div class="member-meta">
         <div class="meta-item"><label>Chamber</label><span>${m.chamber}</span></div>
         <div class="meta-item"><label>Next Election</label><span>${m.nextElection || '—'}</span></div>
         <div class="meta-item"><label>In Office Since</label><span>${m.startDate ? m.startDate.substring(0,4) : '—'}</span></div>
-        <div class="meta-item"><label>Term Ends</label><span>${m.endDate ? m.endDate.substring(0,4) : '—'}</span></div>
+        <div class="meta-item"><label>Term Ends</label><span>${m.termEnd || '—'}</span></div>
       </div>
       <div class="member-card-footer">
         <span class="view-link">View Full Profile →</span>
@@ -760,9 +793,19 @@ async function enrichAndRender(m) {
   renderOverview(m);
   renderProfileHeader(m);
 
-  // Render bills if that tab is visible
+  // Always populate bills (tab will render them when clicked, or now if active)
   const billPanel = document.getElementById('panel-bills');
-  if (billPanel.classList.contains('active')) renderBills('all');
+  if (billPanel.classList.contains('active')) {
+    renderBills('all');
+  } else {
+    // Pre-populate so clicking the tab is instant
+    // (renderBills called by switchTab when user clicks)
+  }
+  // Patch switchTab to not show spinner if bills are ready
+  if (allBills.length) {
+    const listEl = document.getElementById('bills-list');
+    if (listEl && listEl.querySelector('.loading-spinner')) renderBills('all');
+  }
 
   // Finance
   renderFinance(m);
