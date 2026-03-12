@@ -558,6 +558,25 @@ function invertName(inv) {
   return `${parts[1].trim()} ${parts[0].trim()}`;
 }
 
+function stateAbbreviation(nameOrAbbr) {
+  // If already 2-letter abbreviation, return as-is
+  if (nameOrAbbr && nameOrAbbr.length === 2) return nameOrAbbr.toUpperCase();
+  const map = {
+    'Alabama':'AL','Alaska':'AK','Arizona':'AZ','Arkansas':'AR','California':'CA',
+    'Colorado':'CO','Connecticut':'CT','Delaware':'DE','Florida':'FL','Georgia':'GA',
+    'Hawaii':'HI','Idaho':'ID','Illinois':'IL','Indiana':'IN','Iowa':'IA',
+    'Kansas':'KS','Kentucky':'KY','Louisiana':'LA','Maine':'ME','Maryland':'MD',
+    'Massachusetts':'MA','Michigan':'MI','Minnesota':'MN','Mississippi':'MS',
+    'Missouri':'MO','Montana':'MT','Nebraska':'NE','Nevada':'NV','New Hampshire':'NH',
+    'New Jersey':'NJ','New Mexico':'NM','New York':'NY','North Carolina':'NC',
+    'North Dakota':'ND','Ohio':'OH','Oklahoma':'OK','Oregon':'OR','Pennsylvania':'PA',
+    'Rhode Island':'RI','South Carolina':'SC','South Dakota':'SD','Tennessee':'TN',
+    'Texas':'TX','Utah':'UT','Vermont':'VT','Virginia':'VA','Washington':'WA',
+    'West Virginia':'WV','Wisconsin':'WI','Wyoming':'WY','District of Columbia':'DC'
+  };
+  return map[nameOrAbbr] || nameOrAbbr;
+}
+
 function calcTermEnd(isSenator, startYear) {
   if (!startYear) return '—';
   const start = parseInt(startYear);
@@ -962,7 +981,8 @@ async function renderFinance(m) {
   let finData = null;
 
   try {
-    const searchPath = `/fec/v1/candidates/search/?name=${encodeURIComponent(m.lastName)}&office=${m.chamber==='Senate'?'S':'H'}&state=${m.state}&per_page=5`;
+    const stateAbbr = stateAbbreviation(m.state);
+    const searchPath = `/fec/v1/candidates/search/?name=${encodeURIComponent(m.lastName)}&office=${m.chamber==='Senate'?'S':'H'}&state=${stateAbbr}&per_page=5`;
     const fecRes = await fetch(`${PROXY}${searchPath}`);
     if (fecRes.ok) {
       const fecJson = await fecRes.json();
