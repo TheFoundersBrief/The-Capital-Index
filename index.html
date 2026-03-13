@@ -3289,11 +3289,19 @@ async function prefetchCommittees() {
   const BASE = PROXY + '/legislators';
 
   try {
-    // Fetch committee names + membership in parallel — 2 requests total
-    const [membershipRaw, committeesRaw] = await Promise.all([
-      fetch(`${BASE}/committee-membership-current.json`).then(r => r.json()),
-      fetch(`${BASE}/committees-current.json`).then(r => r.json()),
+    console.log('[Committees] Fetching from:', BASE);
+    const [membershipRes, committeesRes] = await Promise.all([
+      fetch(`${BASE}/committee-membership-current.json`),
+      fetch(`${BASE}/committees-current.json`),
     ]);
+    console.log('[Committees] membership status:', membershipRes.status, membershipRes.url);
+    console.log('[Committees] committees status:', committeesRes.status, committeesRes.url);
+    if (!membershipRes.ok) throw new Error(`membership fetch ${membershipRes.status}`);
+    if (!committeesRes.ok) throw new Error(`committees fetch ${committeesRes.status}`);
+    const membershipRaw = await membershipRes.json();
+    const committeesRaw = await committeesRes.json();
+    console.log('[Committees] membership keys:', Object.keys(membershipRaw).length);
+    console.log('[Committees] committees count:', Array.isArray(committeesRaw) ? committeesRaw.length : typeof committeesRaw);
 
     // Build committeeCode -> full name lookup
     // committees-current.json is an array of objects
@@ -3342,7 +3350,7 @@ async function prefetchCommittees() {
 
   } catch(e) {
     console.warn('Committee prefetch failed:', e);
-    committeePrefetchDone = false; // allow retry on next open
+    committeePrefetchDone = false;
   }
 }
 
