@@ -156,10 +156,34 @@
   .ph-subtitle { font-family: var(--sans); font-size: 0.9rem; color: #888; margin-bottom: 22px; }
   .ph-tags { display: flex; gap: 8px; flex-wrap: wrap; }
   .ph-tag { padding: 3px 10px; border: 1px solid #333; font-family: var(--mono); font-size: 0.62rem; letter-spacing: 1px; text-transform: uppercase; color: #aaa; }
-  .ph-party-block { width: 72px; height: 72px; display: flex; align-items: center; justify-content: center; font-family: var(--serif); font-size: 2.6rem; font-weight: 900; flex-shrink: 0; margin-top: 4px; }
+  .ph-party-block { width: 80px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; font-family: var(--serif); font-size: 2.6rem; font-weight: 900; flex-shrink: 0; padding: 10px 6px; }
   .ph-party-block.D { background: var(--blue); }
   .ph-party-block.R { background: var(--red); }
   .ph-party-block.I { background: var(--gold); color: var(--ink); }
+  .ph-party-letter { line-height: 1; }
+  .share-card-btn { display: flex; align-items: center; gap: 5px; background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.32); color: white; font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.5px; padding: 5px 8px; cursor: pointer; text-transform: uppercase; white-space: nowrap; transition: background 0.2s; }
+  .share-card-btn:hover { background: rgba(255,255,255,0.3); }
+  .ph-party-block.I .share-card-btn { color: var(--ink); border-color: rgba(0,0,0,0.2); }
+  .ph-party-block.I .share-card-btn:hover { background: rgba(0,0,0,0.1); }
+
+  /* ── SHARE CARD OVERLAY ── */
+  .sharecard-overlay { display:none; position:fixed; inset:0; background:rgba(10,10,15,0.88); z-index:3000; align-items:center; justify-content:center; padding:20px; }
+  .sharecard-overlay.open { display:flex; }
+  .sharecard-modal { background:var(--paper); max-width:540px; width:100%; animation:slideUp 0.22s ease; }
+  .sharecard-header { background:var(--ink); padding:20px 24px; display:flex; align-items:center; justify-content:space-between; }
+  .sharecard-title { font-family:var(--serif); font-size:1.1rem; color:white; font-weight:700; }
+  .sharecard-subtitle { font-family:var(--mono); font-size:0.62rem; color:var(--gold); margin-top:3px; }
+  .sharecard-close { background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.2); color:white; width:30px; height:30px; cursor:pointer; font-size:0.9rem; }
+  .sharecard-close:hover { background:rgba(255,255,255,0.22); }
+  .sharecard-canvas-wrap { padding:20px; background:white; display:flex; justify-content:center; }
+  .sharecard-canvas-wrap canvas { max-width:100%; box-shadow:0 4px 24px rgba(0,0,0,0.18); }
+  .sharecard-actions { padding:16px 20px; display:flex; gap:10px; background:var(--cream); border-top:1px solid var(--border); }
+  .sharecard-btn { flex:1; padding:11px; font-family:var(--mono); font-size:0.72rem; text-transform:uppercase; letter-spacing:1px; cursor:pointer; border:none; transition:opacity 0.2s; }
+  .sharecard-btn.primary { background:var(--ink); color:white; }
+  .sharecard-btn.primary:hover { opacity:0.85; }
+  .sharecard-btn.secondary { background:white; color:var(--ink); border:1px solid var(--border); }
+  .sharecard-btn.secondary:hover { background:var(--cream); }
+  .sharecard-note { font-family:var(--mono); font-size:0.6rem; color:var(--silver); padding:0 20px 14px; text-align:center; background:var(--cream); }
 
   /* ── PROFILE TABS ── */
   .profile-tabs { background: white; border-bottom: 2px solid var(--border); display: flex; padding: 0 40px; overflow-x: auto; }
@@ -581,6 +605,27 @@
         <div class="contact-grid" id="contact-grid"></div>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- ── SHARE CARD OVERLAY ── -->
+<div class="sharecard-overlay" id="sharecard-overlay" onclick="handleSharecardOverlayClick(event)">
+  <div class="sharecard-modal" id="sharecard-modal">
+    <div class="sharecard-header">
+      <div>
+        <div class="sharecard-title">Member Card</div>
+        <div class="sharecard-subtitle">PNG · Optimized for Twitter / Instagram</div>
+      </div>
+      <button class="sharecard-close" onclick="closeShareCard()">✕</button>
+    </div>
+    <div class="sharecard-canvas-wrap">
+      <canvas id="sharecard-canvas" width="1200" height="630"></canvas>
+    </div>
+    <div class="sharecard-actions">
+      <button class="sharecard-btn primary" onclick="downloadShareCard()">⬇ Download PNG</button>
+      <button class="sharecard-btn secondary" onclick="closeShareCard()">Close</button>
+    </div>
+    <div class="sharecard-note">1200 × 630px · Twitter card size · Right-click canvas to copy image</div>
   </div>
 </div>
 
@@ -1089,7 +1134,16 @@ function renderProfileHeader(m) {
 
   const pb = document.getElementById('ph-party-block');
   pb.className = `ph-party-block ${m.party}`;
-  pb.textContent = m.party;
+  pb.innerHTML = `
+    <span class="ph-party-letter">${m.party}</span>
+    <button class="share-card-btn" onclick="openShareCard()" title="Generate shareable member card">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+        <polyline points="16 6 12 2 8 6"/>
+        <line x1="12" y1="2" x2="12" y2="15"/>
+      </svg>
+      Share Card
+    </button>`;
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1751,6 +1805,277 @@ function loadTrades(member) {
       Official filings: <a href="https://disclosures-clerk.house.gov" target="_blank">House</a> ·
       <a href="https://efts.senate.gov" target="_blank">Senate</a>
     </div>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// SHARE CARD — Canvas renderer
+// 1200×630px (Twitter card / OG image standard)
+// ═══════════════════════════════════════════════════════
+function openShareCard() {
+  const m = currentMember;
+  if (!m) return;
+  document.getElementById('sharecard-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  // Small delay so modal is visible before heavy canvas work
+  setTimeout(() => drawShareCard(m), 60);
+}
+
+function closeShareCard() {
+  document.getElementById('sharecard-overlay').classList.remove('open');
+}
+
+function handleSharecardOverlayClick(e) {
+  if (e.target === document.getElementById('sharecard-overlay')) closeShareCard();
+}
+
+function downloadShareCard() {
+  const canvas = document.getElementById('sharecard-canvas');
+  const m = currentMember;
+  if (!m || !canvas) return;
+  const link = document.createElement('a');
+  link.download = `capital-index-${(m.name || 'member').replace(/[^a-z0-9]/gi, '-').toLowerCase()}.png`;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+
+async function drawShareCard(m) {
+  const canvas = document.getElementById('sharecard-canvas');
+  const ctx    = canvas.getContext('2d');
+  const W = 1200, H = 630;
+  canvas.width  = W;
+  canvas.height = H;
+
+  // ── Palette ────────────────────────────────────────────────────────────────
+  const partyColors = { D: '#1a3a5c', R: '#8c1a1a', I: '#7a5c00' };
+  const partyAccent = { D: '#2a5a9c', R: '#c0392b', I: '#C9A84C' };
+  const partyCol  = partyColors[m.party] || '#1a1a1a';
+  const accentCol = partyAccent[m.party] || '#C9A84C';
+  const GOLD      = '#C9A84C';
+  const INK       = '#1a1a1a';
+  const CREAM     = '#F5F0E8';
+  const WHITE     = '#ffffff';
+  const SILVER    = '#888888';
+
+  // ── Background ─────────────────────────────────────────────────────────────
+  ctx.fillStyle = CREAM;
+  ctx.fillRect(0, 0, W, H);
+
+  // Left color band (party)
+  ctx.fillStyle = partyCol;
+  ctx.fillRect(0, 0, 320, H);
+
+  // Subtle diagonal stripe texture on band
+  ctx.save();
+  ctx.globalAlpha = 0.07;
+  ctx.strokeStyle = WHITE;
+  ctx.lineWidth = 18;
+  for (let i = -H; i < 320 + H; i += 40) {
+    ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i + H, H); ctx.stroke();
+  }
+  ctx.restore();
+
+  // Gold accent bar (left edge)
+  ctx.fillStyle = GOLD;
+  ctx.fillRect(0, 0, 7, H);
+
+  // ── Photo (left column, centered) ─────────────────────────────────────────
+  const photoSize = 180;
+  const photoX    = (320 - photoSize) / 2;
+  const photoY    = 80;
+
+  if (m.depiction) {
+    try {
+      const img = await loadImage(m.depiction);
+      // Circular clip
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(photoX + photoSize / 2, photoY + photoSize / 2, photoSize / 2, 0, Math.PI * 2);
+      ctx.closePath();
+      ctx.clip();
+      ctx.drawImage(img, photoX, photoY, photoSize, photoSize);
+      ctx.restore();
+      // Ring
+      ctx.beginPath();
+      ctx.arc(photoX + photoSize / 2, photoY + photoSize / 2, photoSize / 2 + 3, 0, Math.PI * 2);
+      ctx.strokeStyle = GOLD;
+      ctx.lineWidth = 4;
+      ctx.stroke();
+    } catch(e) {
+      drawInitialsCircle(ctx, photoX, photoY, photoSize, m.name, WHITE, partyAccent[m.party] || GOLD);
+    }
+  } else {
+    drawInitialsCircle(ctx, photoX, photoY, photoSize, m.name, WHITE, partyAccent[m.party] || GOLD);
+  }
+
+  // Party badge below photo
+  const badgeY  = photoY + photoSize + 20;
+  const partyLabel = m.party === 'D' ? 'DEMOCRAT' : m.party === 'R' ? 'REPUBLICAN' : 'INDEPENDENT';
+  ctx.fillStyle = GOLD;
+  const badgeW = 180, badgeH = 28;
+  ctx.fillRect(photoX, badgeY, badgeW, badgeH);
+  ctx.fillStyle = INK;
+  ctx.font = 'bold 13px Arial';
+  ctx.textAlign = 'center';
+  ctx.fillText(partyLabel, photoX + badgeW / 2, badgeY + 19);
+
+  // Chamber pill below party badge
+  const chamberY = badgeY + badgeH + 10;
+  ctx.fillStyle = 'rgba(255,255,255,0.15)';
+  ctx.fillRect(photoX, chamberY, badgeW, 26);
+  ctx.fillStyle = WHITE;
+  ctx.font = '13px Arial';
+  const chamberText = `${m.chamber.toUpperCase()} · ${m.state}${m.district ? ' · DIST. ' + m.district : ''}`;
+  ctx.fillText(chamberText, photoX + badgeW / 2, chamberY + 18);
+
+  // ── Right column ─────────────────────────────────────────────────────────
+  const RX = 356; // right section x start
+  const RW = W - RX - 40;
+
+  // Eyebrow
+  ctx.fillStyle = GOLD;
+  ctx.font = 'bold 13px Arial';
+  ctx.textAlign = 'left';
+  ctx.fillText('THE CAPITAL INDEX  ·  THE FOUNDERS BRIEF', RX, 56);
+
+  // Thin gold rule under eyebrow
+  ctx.fillStyle = GOLD;
+  ctx.fillRect(RX, 64, 400, 2);
+
+  // Name
+  ctx.fillStyle = INK;
+  const nameFontSize = m.name.length > 22 ? 44 : 52;
+  ctx.font = `900 ${nameFontSize}px Georgia, serif`;
+  ctx.textAlign = 'left';
+  // Wrap long names
+  const nameLines = wrapText(ctx, m.name, RW, nameFontSize);
+  nameLines.forEach((line, i) => {
+    ctx.fillText(line, RX, 112 + i * (nameFontSize + 8));
+  });
+
+  const nameEndY = 112 + nameLines.length * (nameFontSize + 8);
+
+  // Title / subtitle
+  ctx.fillStyle = SILVER;
+  ctx.font = '18px Arial';
+  ctx.fillText(`${m.title}  ·  ${stateName(m.state)}`, RX, nameEndY + 8);
+
+  // Gold divider
+  ctx.fillStyle = GOLD;
+  ctx.fillRect(RX, nameEndY + 26, RW, 2);
+
+  // ── Stats grid ────────────────────────────────────────────────────────────
+  const statsY  = nameEndY + 50;
+  const colW    = Math.floor(RW / 3);
+
+  const inOfficeSince = m.startDate ? m.startDate.slice(0, 4) : '—';
+  const yearsInOffice = m.startDate ? String(new Date().getFullYear() - parseInt(m.startDate)) : (m.yearsInOffice ? String(m.yearsInOffice) : '—');
+  const nextElection  = m.nextElection || '—';
+  const billCount     = allBills.filter(b => b.role === 'sponsored').length || (m.billCount != null ? m.billCount : '—');
+
+  const stats = [
+    { label: 'IN OFFICE SINCE', val: inOfficeSince },
+    { label: 'YEARS IN OFFICE', val: yearsInOffice },
+    { label: 'NEXT ELECTION',   val: nextElection },
+    { label: 'BILLS SPONSORED', val: String(billCount) },
+    { label: 'CHAMBER',         val: m.chamber.toUpperCase() },
+    { label: 'PARTY',           val: partyLabel },
+  ];
+
+  stats.forEach((s, i) => {
+    const col = i % 3;
+    const row = Math.floor(i / 3);
+    const sx  = RX + col * colW;
+    const sy  = statsY + row * 100;
+
+    // Card background
+    ctx.fillStyle = col % 2 === 0 ? WHITE : '#F0EBE3';
+    ctx.fillRect(sx, sy, colW - 8, 88);
+
+    // Accent bar top
+    ctx.fillStyle = accentCol;
+    ctx.fillRect(sx, sy, colW - 8, 4);
+
+    // Value
+    ctx.fillStyle = partyCol;
+    ctx.font = `bold 26px Georgia, serif`;
+    ctx.textAlign = 'left';
+    ctx.fillText(s.val, sx + 14, sy + 42);
+
+    // Label
+    ctx.fillStyle = SILVER;
+    ctx.font = 'bold 11px Arial';
+    ctx.fillText(s.label, sx + 14, sy + 66);
+  });
+
+  // ── Bottom bar ────────────────────────────────────────────────────────────
+  ctx.fillStyle = INK;
+  ctx.fillRect(0, H - 52, W, 52);
+
+  // Gold left accent on footer
+  ctx.fillStyle = GOLD;
+  ctx.fillRect(0, H - 52, 7, 52);
+
+  // URL / branding
+  ctx.fillStyle = SILVER;
+  ctx.font = '13px Arial';
+  ctx.textAlign = 'left';
+  ctx.fillText('thefoundersbrief.github.io/The-Capital-Index', 24, H - 18);
+
+  // Right: "Data: Congress.gov · FEC · GovTrack"
+  ctx.fillStyle = '#555';
+  ctx.textAlign = 'right';
+  ctx.fillText('Data: Congress.gov · FEC.gov · GovTrack.us', W - 24, H - 18);
+
+  // Gold center divider in footer
+  ctx.fillStyle = GOLD;
+  ctx.fillRect(W / 2 - 1, H - 42, 2, 28);
+}
+
+// ── Canvas helpers ─────────────────────────────────────────────────────────
+function loadImage(src) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload  = () => resolve(img);
+    img.onerror = () => reject(new Error('Image load failed'));
+    img.src = src;
+  });
+}
+
+function drawInitialsCircle(ctx, x, y, size, name, textColor, bgColor) {
+  const cx = x + size / 2, cy = y + size / 2, r = size / 2;
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.fillStyle = bgColor;
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+  ctx.lineWidth = 3;
+  ctx.stroke();
+  const initials = name.split(' ').map(w => w[0]).filter(Boolean).slice(-2).join('');
+  ctx.fillStyle = textColor;
+  ctx.font = `bold ${Math.floor(size * 0.38)}px Georgia, serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(initials, cx, cy + 2);
+  ctx.textBaseline = 'alphabetic';
+}
+
+function wrapText(ctx, text, maxWidth, fontSize) {
+  const words = text.split(' ');
+  const lines = [];
+  let current = '';
+  ctx.font = `900 ${fontSize}px Georgia, serif`;
+  for (const word of words) {
+    const test = current ? current + ' ' + word : word;
+    if (ctx.measureText(test).width > maxWidth && current) {
+      lines.push(current);
+      current = word;
+    } else {
+      current = test;
+    }
+  }
+  if (current) lines.push(current);
+  return lines.slice(0, 2); // max 2 lines
 }
 
 // ═══════════════════════════════════════════════════════
