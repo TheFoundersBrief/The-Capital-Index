@@ -1649,7 +1649,7 @@ async function enrichAndRender(m) {
     ...cosponsored.filter(isBill).map(b => ({ ...normalizeBill(b), role: 'cosponsored' })),
   ];
 
-  // Re-render overview with enriched data
+  // Re-render overview with enriched data (report card uses allBills)
   renderOverview(m);
   renderProfileHeader(m);
 
@@ -1772,15 +1772,22 @@ function normalizeBill(b) {
 
   const statusLabels = { signed:'Signed Law', passed:'Passed', committee:'In Committee', introduced:'Introduced', failed:'Failed' };
 
+  // Congress.gov returns sponsors[] on cosponsored-legislation endpoint
+  // Each sponsor has partyName e.g. "Republican", "Democratic"
+  const sponsorParty = (b.sponsors?.[0]?.partyName || b.sponsor?.partyName || '').toLowerCase();
+  const sponsorPartyCode = sponsorParty.includes('democrat') ? 'D'
+                         : sponsorParty.includes('republican') ? 'R' : '';
+
   return {
-    number:    `${b.type || ''} ${b.number || ''}`.trim(),
-    title:     b.title || 'Untitled',
-    introduced: b.introducedDate || '',
-    latestAction: (b.latestAction?.text || '').substring(0, 90),
-    congress:  b.congress,
-    url:       b.url || '',
+    number:      `${b.type || ''} ${b.number || ''}`.trim(),
+    title:       b.title || 'Untitled',
+    introduced:  b.introducedDate || '',
+    latestAction:(b.latestAction?.text || '').substring(0, 90),
+    congress:    b.congress,
+    url:         b.url || '',
     statusClass,
     statusLabel: statusLabels[statusClass],
+    sponsorPartyCode,
   };
 }
 
@@ -3053,7 +3060,8 @@ function renderComparison(el, mA, dA, mB, dB) {
 // ═══════════════════════════════════════════════════════
 // REPORT CARD ENGINE
 // Accountability-focused: high PAC funding & missed votes = lower grade
-// Weights: Attendance 30 | Independence 25 | PAC cleanliness 25 | Tenure 20
+// Weights: Attendance 30 | Independence 25 | PAC cleanliness 25
+//          Legislative Effectiveness 12 | Bipartisanship 8
 // ═══════════════════════════════════════════════════════
 
 function calcReportCard(m) {
@@ -3096,20 +3104,55 @@ function calcReportCard(m) {
     }
   }
 
-  // ── 4. TENURE (20 pts) — longer = more experienced ───────────────────────
-  const years = m.yearsInOffice
-    || (m.startDate ? new Date().getFullYear() - parseInt(m.startDate) : null);
-  if (years != null && years >= 0) {
-    const pts = Math.min(20, 5 + (years / 20) * 15);
-    details.push({ label:'Tenure', score:pts, max:20,
-      display: years+' yrs in office', fill:pts/20, color:'#1a3a5c' });
-    total += pts; weight += 20;
+  // ── 4. LEGISLATIVE EFFECTIVENESS (12 pts) ─────────────────────────────────
+  // Sponsored bills that reached passed/signed ÷ total sponsored
+  // Uses allBills which is loaded when the Legislation tab is opened.
+  // Minimum 3 sponsored bills required to avoid rewarding members who
+  // never sponsor anything — they score 0 on this metric instead.
+  const sponsored   = allBills.filter(b => b.role === 'sponsored');
+  const effective   = sponsored.filter(b => b.statusClass === 'signed' || b.statusClass === 'passed');
+  if (sponsored.length >= 3) {
+    const pct = effective.length / sponsored.length;  // 0–1
+    // 0% pass rate → 0pts, 20%+ pass rate → full 12pts (20% is high for Congress)
+    const pts = Math.min(12, (pct / 0.20) * 12);
+    details.push({ label:'Legislative Effectiveness', score:pts, max:12,
+      display: effective.length + '/' + sponsored.length + ' bills passed', fill:pts/12,
+      color: pts>=9?'#16a34a':pts>=5?'#d97706':'#dc2626' });
+    total += pts; weight += 12;
+  } else if (sponsored.length > 0 && sponsored.length < 3) {
+    // Too few bills to score fairly — note it but don't penalize
+    details.push({ label:'Legislative Effectiveness', score:0, max:12,
+      display: 'Too few bills to score', fill:0, color:'#ccc', unscored:true });
+  }
+
+  // ── 5. BIPARTISANSHIP (8 pts) ─────────────────────────────────────────────
+  // Co-sponsored bills that were sponsored by a member of the OPPOSITE party.
+  // Congress.gov returns sponsor party on the cosponsored-legislation endpoint.
+  // Members with no opposite-party cosponsors or no cosponsored bills score 0.
+  const memberParty  = m.party;  // 'D', 'R', or 'I'
+  const cosponsored  = allBills.filter(b => b.role === 'cosponsored' && b.sponsorPartyCode);
+  if (cosponsored.length >= 5) {
+    const crossParty  = cosponsored.filter(b => {
+      if (memberParty === 'I') return true;   // independents: any party counts
+      return b.sponsorPartyCode && b.sponsorPartyCode !== memberParty;
+    });
+    const pct = crossParty.length / cosponsored.length;   // 0–1
+    // 0% cross-party → 0pts, 30%+ cross-party → full 8pts
+    const pts = Math.min(8, (pct / 0.30) * 8);
+    details.push({ label:'Bipartisanship', score:pts, max:8,
+      display: crossParty.length + '/' + cosponsored.length + ' cross-party', fill:pts/8,
+      color: pts>=6?'#16a34a':pts>=3?'#d97706':'#dc2626' });
+    total += pts; weight += 8;
+  } else if (allBills.length > 0) {
+    // Bills loaded but not enough cosponsored to score
+    details.push({ label:'Bipartisanship', score:0, max:8,
+      display: 'Insufficient data', fill:0, color:'#ccc', unscored:true });
   }
 
   if (!details.length) return null;
   const normalized = weight > 0 ? Math.round((total / weight) * 100) : 0;
   const grade = normalized>=90?'A':normalized>=75?'B':normalized>=60?'C':normalized>=45?'D':'F';
-  return { score:normalized, grade, details, available:details.length };
+  return { score:normalized, grade, details, available:details.filter(d=>!d.unscored).length };
 }
 
 function renderReportCard(m) {
@@ -3117,8 +3160,8 @@ function renderReportCard(m) {
   if (!rc) return `
     <div class="rc-wrap" style="margin-bottom:16px">
       <div class="rc-title">Accountability Score</div>
-      <div class="rc-unavail">Score unavailable — open <strong>Voting Record</strong> and
-        <strong>Campaign Finance</strong> tabs first to load the required data.</div>
+      <div class="rc-unavail">Score unavailable — open the <strong>Voting Record</strong>,
+        <strong>Campaign Finance</strong>, and <strong>Legislation</strong> tabs first to load all data.</div>
     </div>`;
 
   const gradeDesc = {A:'Excellent accountability',B:'Good accountability',
@@ -3132,7 +3175,7 @@ function renderReportCard(m) {
       <div>
         <div class="rc-title">Accountability Score</div>
         <div style="font-family:var(--mono);font-size:0.6rem;color:var(--silver);margin-top:3px">
-          ${rc.available<3?'⚠ Partial — open Voting Record &amp; Finance tabs for full score':'Based on '+rc.available+' metrics'}
+          ${rc.available<3?'⚠ Partial — open Voting Record, Finance &amp; Legislation tabs for full score':'Based on '+rc.available+' metrics'}
         </div>
       </div>
       <div class="rc-grade-block">
@@ -3145,14 +3188,14 @@ function renderReportCard(m) {
     </div>
     <div class="rc-rows">
       ${rc.details.map(d=>`
-        <div class="rc-row">
-          <div class="rc-row-label">${d.label}</div>
+        <div class="rc-row" ${d.unscored?'style="opacity:0.45"':''}>
+          <div class="rc-row-label">${d.label}${d.unscored?' <span style='font-size:0.55rem;color:#bbb'>(unscored)</span>':''}</div>
           <div class="rc-track"><div class="rc-fill" style="width:${Math.round(d.fill*100)}%;background:${d.color}"></div></div>
           <div class="rc-row-val">${d.display}</div>
         </div>`).join('')}
     </div>
     <div style="font-family:var(--mono);font-size:0.58rem;color:var(--silver);margin-top:12px;line-height:1.7">
-      ${gradeDesc[rc.grade]} · Weights: Attendance 30%, Independence 25%, PAC Funding 25%, Tenure 20%
+      ${gradeDesc[rc.grade]} · Weights: Attendance 30%, Independence 25%, PAC Funding 25%, Legislative Effectiveness 12%, Bipartisanship 8%
     </div>
   </div>`;
 }
