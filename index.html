@@ -203,7 +203,11 @@
   .sharecard-btn.primary:hover { opacity:0.85; }
   .sharecard-btn.secondary { background:white; color:var(--ink); border:1px solid var(--border); }
   .sharecard-btn.secondary:hover { background:var(--cream); }
-  .sharecard-note { font-family:var(--mono); font-size:0.6rem; color:var(--silver); padding:0 20px 14px; text-align:center; background:var(--cream); }
+  .sharecard-note { font-family:var(--mono); font-size:0.6rem; color:var(--silver); padding:8px 20px 14px; text-align:center; background:var(--cream); line-height:1.7; }
+  .sharecard-link-row { padding:0 20px 10px; background:var(--cream); display:flex; gap:8px; }
+  .sharecard-link-input { flex:1; font-family:var(--mono); font-size:0.68rem; padding:7px 10px; border:1px solid var(--border); background:white; color:var(--ink); outline:none; cursor:text; }
+  .sharecard-link-input:focus { border-color:var(--blue); }
+  .sharecard-btn.copied { background:var(--gold) !important; color:var(--ink) !important; }
 
   /* ── PROFILE TABS ── */
   .profile-tabs { background: white; border-bottom: 2px solid var(--border); display: flex; padding: 0 40px; overflow-x: auto; }
@@ -975,8 +979,8 @@
   <div class="sharecard-modal" id="sharecard-modal">
     <div class="sharecard-header">
       <div>
-        <div class="sharecard-title">Member Card</div>
-        <div class="sharecard-subtitle">PNG · Optimized for Twitter / Instagram</div>
+        <div class="sharecard-title">Share Member Card</div>
+        <div class="sharecard-subtitle">Copy link · Download PNG</div>
       </div>
       <button class="sharecard-close" onclick="closeShareCard()">✕</button>
     </div>
@@ -984,10 +988,17 @@
       <canvas id="sharecard-canvas" width="1200" height="630"></canvas>
     </div>
     <div class="sharecard-actions">
-      <button class="sharecard-btn primary" onclick="downloadShareCard()">⬇ Download PNG</button>
+      <button class="sharecard-btn primary" id="sharecard-copy-btn" onclick="copyShareLink()">🔗 Copy Link</button>
+      <button class="sharecard-btn secondary" onclick="downloadShareCard()">⬇ PNG</button>
       <button class="sharecard-btn secondary" onclick="closeShareCard()">Close</button>
     </div>
-    <div class="sharecard-note">1200 × 630px · Twitter card size · Right-click canvas to copy image</div>
+    <div class="sharecard-link-row" id="sharecard-link-row">
+      <input class="sharecard-link-input" id="sharecard-link-input" type="text" readonly onclick="this.select()">
+    </div>
+    <div class="sharecard-note" id="sharecard-note-text">
+      Paste this link anywhere — Twitter/X, email, Slack, iMessage.<br>
+      Most platforms will show a site preview. Download the PNG to share the card image directly.
+    </div>
   </div>
 </div>
 
@@ -2448,10 +2459,42 @@ function loadTrades(member) {
 function openShareCard() {
   const m = currentMember;
   if (!m) return;
+
+  // Build and populate the deep-link URL
+  const base = 'https://thefoundersbrief.github.io/The-Capital-Index/';
+  const url  = `${base}#${m.bioguideId}`;
+  const input = document.getElementById('sharecard-link-input');
+  if (input) input.value = url;
+
+  // Reset copy button state
+  const btn = document.getElementById('sharecard-copy-btn');
+  if (btn) { btn.textContent = '🔗 Copy Link'; btn.classList.remove('copied'); }
+
   document.getElementById('sharecard-overlay').classList.add('open');
   document.body.style.overflow = 'hidden';
   // Small delay so modal is visible before heavy canvas work
   setTimeout(() => drawShareCard(m), 60);
+}
+
+async function copyShareLink() {
+  const input = document.getElementById('sharecard-link-input');
+  const btn   = document.getElementById('sharecard-copy-btn');
+  if (!input || !btn) return;
+
+  try {
+    await navigator.clipboard.writeText(input.value);
+  } catch(e) {
+    // Fallback for browsers that block clipboard without HTTPS interaction
+    input.select();
+    document.execCommand('copy');
+  }
+
+  btn.textContent = '✓ Copied!';
+  btn.classList.add('copied');
+  setTimeout(() => {
+    btn.textContent = '🔗 Copy Link';
+    btn.classList.remove('copied');
+  }, 2200);
 }
 
 function closeShareCard() {
