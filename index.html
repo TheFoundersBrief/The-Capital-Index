@@ -2799,7 +2799,7 @@ function renderComparison(el, mA, dA, mB, dB) {
 }
 
 // ═══════════════════════════════════════════════════════
-// COMMITTEE PRE-FETCH  (background, batched)
+// COMMITTEE PRE-FETCH  (single bulk fetch from unitedstates project)
 // ═══════════════════════════════════════════════════════
 let committeePrefetchDone = false;
 
@@ -2807,45 +2807,63 @@ async function prefetchCommittees() {
   if (committeePrefetchDone) return;
   committeePrefetchDone = true;
 
-  // Only fetch members who don't already have committee data
-  const needed = allMembers.filter(m => !m.committees?.length);
-  if (!needed.length) return;
+  const BASE = 'https://unitedstates.github.io/congress-legislators';
 
-  const BATCH = 8;   // concurrent requests
-  const DELAY = 120; // ms between batches — keeps Worker load low
+  try {
+    // Fetch committee names + membership in parallel — 2 requests total
+    const [membershipRaw, committeesRaw] = await Promise.all([
+      fetch(`${BASE}/committee-membership-current.json`).then(r => r.json()),
+      fetch(`${BASE}/committees-current.json`).then(r => r.json()),
+    ]);
 
-  for (let i = 0; i < needed.length; i += BATCH) {
-    const batch = needed.slice(i, i + BATCH);
-    await Promise.allSettled(batch.map(async m => {
-      try {
-        const data = await apiFetch(`/v3/member/${m.bioguideId}`);
-        const d = data?.member;
-        if (!d) return;
-        m.committees = (d.terms?.item || [])
-          .flatMap(t => t.committees || [])
-          .map(c => c.name)
-          .filter((v, idx, a) => a.indexOf(v) === idx)
-          .slice(0, 10);
-        // Also grab yearsInOffice and depiction while we're here
-        const terms = d.terms?.item || [];
-        if (terms.length && !m.yearsInOffice) {
-          const firstYear = parseInt(terms[0].startYear) || 0;
-          if (firstYear) m.yearsInOffice = new Date().getFullYear() - firstYear;
-        }
-        if (d.depiction?.imageUrl && !m.depiction) m.depiction = d.depiction.imageUrl;
-      } catch(e) { /* skip on error */ }
-    }));
-
-    // Small pause between batches to be a good API citizen
-    if (i + BATCH < needed.length) {
-      await new Promise(r => setTimeout(r, DELAY));
+    // Build committeeCode -> full name lookup
+    // committees-current.json is an array of objects
+    const codeToName = {};
+    for (const c of committeesRaw) {
+      if (c.thomas_id) codeToName[c.thomas_id] = c.name;
+      if (c.type === 'subcommittee' && c.thomas_id) {
+        codeToName[c.thomas_id] = c.name;
+      }
+      // Subcommittees are nested under parent committees
+      for (const sub of (c.subcommittees || [])) {
+        const subCode = c.thomas_id + sub.thomas_id;
+        codeToName[subCode] = sub.name;
+      }
     }
-  }
 
-  // Update status indicator
-  const loaded = allMembers.filter(m => m.committees?.length).length;
-  const statusEl = document.getElementById('nav-status');
-  if (statusEl) statusEl.textContent = `${allMembers.length} members · committees loaded`;
+    // Build bioguideId -> [committee names] lookup
+    // membership is { "SSAF": [{bioguide_id: "...", ...}], ... }
+    const bioToCommittees = {};
+    for (const [code, members] of Object.entries(membershipRaw)) {
+      const committeeName = codeToName[code] || code;
+      for (const entry of members) {
+        const bio = entry.bioguide_id;
+        if (!bio) continue;
+        if (!bioToCommittees[bio]) bioToCommittees[bio] = new Set();
+        // Only add top-level committees (skip subcommittees for cleaner search)
+        if (code.length <= 4) bioToCommittees[bio].add(committeeName);
+      }
+    }
+
+    // Apply to allMembers
+    let enriched = 0;
+    for (const m of allMembers) {
+      const names = bioToCommittees[m.bioguideId];
+      if (names?.size) {
+        m.committees = [...names];
+        enriched++;
+      } else if (!m.committees?.length) {
+        m.committees = [];
+      }
+    }
+
+    const statusEl = document.getElementById('nav-status');
+    if (statusEl) statusEl.textContent = `${allMembers.length} members · ${enriched} with committees`;
+
+  } catch(e) {
+    console.warn('Committee prefetch failed:', e);
+    // Fall back to the per-member approach for anyone who opens the discover panel
+  }
 }
 
 // ═══════════════════════════════════════════════════════
@@ -2887,10 +2905,9 @@ function filterByCommittee() {
   if (query.length < 2) {
     const withCommittees = allMembers.filter(m => m.committees?.length).length;
     const total = allMembers.length;
-    const pct = total ? Math.round(withCommittees / total * 100) : 0;
-    container.innerHTML = withCommittees < total
-      ? `<div class="discover-empty">Loading committee data… ${withCommittees}/${total} members indexed (${pct}%).<br><span style="font-size:0.65rem">You can start searching now — more results appear as data loads.</span></div>`
-      : `<div class="discover-empty">All ${total} members indexed. Start typing a committee name above.</div>`;
+    container.innerHTML = withCommittees === 0
+      ? `<div class="discover-empty">Loading committee data… <span style="font-size:0.65rem">Usually ready within a few seconds.</span></div>`
+      : `<div class="discover-empty">${withCommittees} members indexed. Start typing a committee name above.</div>`;
     return;
   }
 
@@ -2901,15 +2918,13 @@ function filterByCommittee() {
 
   if (!matches.length) {
     const withCommittees = allMembers.filter(m => m.committees?.length).length;
-    const totalMembers   = allMembers.length;
-    const pct = totalMembers ? Math.round(withCommittees / totalMembers * 100) : 0;
-    const stillLoading   = withCommittees < totalMembers;
+    const stillLoading   = withCommittees < allMembers.length * 0.5;
     container.innerHTML = `<div class="discover-empty">
       No members found matching "<strong>${query}</strong>".<br>
       <span style="font-size:0.65rem">
         ${stillLoading
-          ? `Committee data loading in background… ${withCommittees}/${totalMembers} members indexed (${pct}%). Try again in a moment.`
-          : 'All committees indexed. Check the spelling — try "Armed Services", "Finance", "Judiciary", "Energy", etc.'}
+          ? 'Committee data is still loading — try again in a few seconds.'
+          : 'Try: "Armed Services", "Finance", "Judiciary", "Energy", "Banking", "Intelligence", "Budget".'}
       </span>
     </div>`;
     return;
