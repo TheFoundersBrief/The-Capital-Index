@@ -553,6 +553,58 @@
   .about-footer-btn { background:none; border:none; color:var(--gold); font-family:var(--mono); font-size:0.65rem; cursor:pointer; padding:0; text-decoration:underline; margin-top:6px; }
   .about-footer-btn:hover { color:white; }
 
+  /* ── REPORT CARD ── */
+  .rc-wrap { background:white; border:1px solid var(--border); padding:20px 24px; margin-bottom:16px; }
+  .rc-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; flex-wrap:wrap; gap:12px; }
+  .rc-grade-block { display:flex; align-items:center; gap:16px; }
+  .rc-grade { font-family:var(--serif); font-size:3rem; font-weight:900; line-height:1; }
+  .rc-grade.A { color:#166534; }
+  .rc-grade.B { color:#1e40af; }
+  .rc-grade.C { color:#92400e; }
+  .rc-grade.D { color:#9a3412; }
+  .rc-grade.F { color:#7f1d1d; }
+  .rc-score-wrap { }
+  .rc-score-label { font-family:var(--mono); font-size:0.58rem; text-transform:uppercase; letter-spacing:1.5px; color:var(--silver); margin-bottom:2px; }
+  .rc-score-val { font-family:var(--serif); font-size:1.3rem; font-weight:700; color:var(--ink); }
+  .rc-title { font-family:var(--mono); font-size:0.62rem; text-transform:uppercase; letter-spacing:2px; color:var(--silver); }
+  .rc-disclaimer { font-family:var(--mono); font-size:0.6rem; color:var(--silver); max-width:220px; text-align:right; line-height:1.5; }
+  .rc-rows { display:flex; flex-direction:column; gap:10px; }
+  .rc-row { display:grid; grid-template-columns:130px 1fr 52px; align-items:center; gap:10px; }
+  .rc-row-label { font-family:var(--mono); font-size:0.65rem; color:var(--silver); text-transform:uppercase; letter-spacing:0.5px; }
+  .rc-track { height:8px; background:var(--cream); overflow:hidden; border-radius:1px; }
+  .rc-fill { height:100%; border-radius:1px; transition:width 0.6s ease; }
+  .rc-row-val { font-family:var(--mono); font-size:0.72rem; font-weight:600; color:var(--ink); text-align:right; }
+  .rc-unavail { font-family:var(--mono); font-size:0.7rem; color:var(--silver); padding:12px 0 4px; line-height:1.8; }
+
+  /* Grade colours on member card */
+  .card-grade { font-family:var(--serif); font-size:1rem; font-weight:900; padding:3px 7px; border:1px solid; line-height:1; }
+  .card-grade.A { color:#166534; border-color:#bbf7d0; background:#f0fdf4; }
+  .card-grade.B { color:#1e40af; border-color:#bfdbfe; background:#eff6ff; }
+  .card-grade.C { color:#92400e; border-color:#fde68a; background:#fffbeb; }
+  .card-grade.D { color:#9a3412; border-color:#fed7aa; background:#fff7ed; }
+  .card-grade.F { color:#7f1d1d; border-color:#fecaca; background:#fef2f2; }
+
+  /* ── TRENDING SECTION ── */
+  .trending-section { margin-bottom:36px; }
+  .trending-header { display:flex; align-items:baseline; justify-content:space-between; margin-bottom:12px; }
+  .trending-title { font-family:var(--serif); font-size:1.3rem; font-weight:700; color:var(--ink); }
+  .trending-clear { font-family:var(--mono); font-size:0.62rem; color:var(--silver); cursor:pointer; text-decoration:underline; }
+  .trending-clear:hover { color:var(--ink); }
+  .trending-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:2px; }
+  .trending-card { background:white; border:1px solid var(--border); padding:14px 16px; cursor:pointer; transition:border-color 0.15s; display:flex; align-items:center; gap:12px; }
+  .trending-card:hover { border-color:var(--blue); }
+  .trending-rank { font-family:var(--serif); font-size:1.4rem; font-weight:900; color:var(--border); min-width:24px; }
+  .trending-info { flex:1; min-width:0; }
+  .trending-name { font-family:var(--sans); font-size:0.82rem; font-weight:600; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .trending-meta { font-family:var(--mono); font-size:0.6rem; color:var(--silver); margin-top:2px; }
+  .trending-views { font-family:var(--mono); font-size:0.65rem; color:var(--gold); font-weight:600; white-space:nowrap; }
+
+  /* ── TRADE ALERT (RSS) ── */
+  .trade-rss-row { display:flex; align-items:center; gap:10px; margin-top:14px; flex-wrap:wrap; }
+  .trade-rss-btn { display:inline-flex; align-items:center; gap:6px; padding:7px 14px; font-family:var(--mono); font-size:0.65rem; background:#f97316; color:white; text-decoration:none; border:none; cursor:pointer; }
+  .trade-rss-btn:hover { background:#ea580c; }
+  .trade-rss-note { font-family:var(--mono); font-size:0.62rem; color:var(--silver); line-height:1.6; }
+
   /* ── COMPARE QUICK-START ── */
   .compare-quickstart { padding:16px 32px 0; background:var(--blue); }
   .compare-qs-label { font-family:var(--mono); font-size:0.6rem; letter-spacing:2px; text-transform:uppercase; color:#7a9cc0; margin-bottom:8px; }
@@ -708,6 +760,15 @@
       <div class="stat-item"><span class="stat-num" id="stat-dem">—</span><span class="stat-label">Democrat</span></div>
       <div class="stat-item"><span class="stat-num red" id="stat-rep">—</span><span class="stat-label">Republican</span></div>
       <div class="stat-item"><span class="stat-num gold" id="stat-ind">—</span><span class="stat-label">Independent</span></div>
+    </div>
+
+    <!-- Trending section — shown only when there's history -->
+    <div class="trending-section" id="trending-section" style="display:none">
+      <div class="trending-header">
+        <div class="trending-title">📈 Trending This Session</div>
+        <span class="trending-clear" onclick="clearTrending()">Clear history</span>
+      </div>
+      <div class="trending-grid" id="trending-grid"></div>
     </div>
 
     <div class="section-header">
@@ -1093,6 +1154,7 @@ async function loadAllMembers() {
     allMembers = combined.map(normalizeCongressMember).filter(m => m.name);
     updateStats();
     applyFilters();
+    renderTrending();
     document.getElementById('nav-status').textContent =
       `${allMembers.length} members loaded`;
 
@@ -1343,6 +1405,7 @@ function renderGrid() {
       </div>
       <div class="member-card-footer">
         <span class="view-link">View Full Profile →</span>
+        ${cardGradeBadge(m)}
       </div>
     </article>
   `).join('');
@@ -1407,6 +1470,9 @@ async function openProfile(id, tab = 'overview') {
   if (!m) return;
   currentMember = m;
   allBills = [];
+
+  // Record view for trending
+  recordView(id);
 
   // Update URL hash for deep-linking
   history.replaceState(null, '', `#${id}${tab !== 'overview' ? '/' + tab : ''}`);
@@ -1576,6 +1642,9 @@ function renderOverview(m) {
     extra += `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:2px;padding:16px 20px;background:var(--cream);border:1px solid var(--border)">${links.join('')}</div>`;
   }
 
+  // Report card — render if enough data available
+  extra = renderReportCard(m) + extra;
+
   document.getElementById('overview-extra').innerHTML = extra;
 }
 
@@ -1701,6 +1770,7 @@ async function renderFinance(m) {
                 : '—',
               cycle:        tot.cycle,
             };
+            storeFinanceForReportCard(m, finData);
           }
         }
       }
@@ -1989,9 +2059,11 @@ function renderVotes(el, member, person, role, votes) {
   const ideology   = role?.ideology_score       != null ? parseFloat(role.ideology_score)              : null;
   const leadership = role?.leadership_score     != null ? (role.leadership_score * 100).toFixed(0)     : null;
 
-  // Store on member object for Discover similarity matching
-  if (ideology !== null) member.govtrackIdeology = ideology;
+  // Store on member object for Discover similarity matching + report card
+  if (ideology !== null)  member.govtrackIdeology  = ideology;
   if (leadership !== null) member.govtrackLeadership = parseFloat(role.leadership_score);
+  if (missedPct  !== null) member.govtrackMissedPct  = parseFloat(missedPct);
+  if (partyPct   !== null) member.govtrackPartyPct   = parseFloat(partyPct);
 
   let ideologyLabel = '—', ideologyColor = 'var(--silver)';
   if (ideology !== null) {
@@ -2229,6 +2301,24 @@ function loadTrades(member) {
       Data compiled by <a href="https://www.capitoltrades.com" target="_blank">Capitol Trades / 2iQ Research</a> ·
       Official filings: <a href="https://disclosures-clerk.house.gov" target="_blank">House</a> ·
       <a href="https://efts.senate.gov" target="_blank">Senate</a>
+    </div>
+
+    <div class="trades-ct-card" style="margin-top:12px">
+      <div class="trades-ct-logo" style="font-size:0.78rem;margin-bottom:6px">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/></svg>
+        Trade Alerts via RSS
+      </div>
+      <div class="trade-rss-note">
+        Subscribe to ${name}'s STOCK Act disclosures in any RSS reader (Feedly, Reeder, NewsBlur, etc.)
+        to get notified when new trades are filed.
+      </div>
+      <div class="trade-rss-row">
+        <a class="trade-rss-btn" href="https://www.capitoltrades.com/politicians/${bioguide}/rss" target="_blank">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/></svg>
+          Subscribe to RSS Feed ↗
+        </a>
+        <span class="trade-rss-note">Opens in your default RSS reader · No account needed</span>
+      </div>
     </div>`;
 }
 
@@ -2796,6 +2886,184 @@ function renderComparison(el, mA, dA, mB, dB) {
       <a href="https://www.fec.gov" target="_blank" style="color:var(--gold)">FEC</a> ·
       <a href="https://www.govtrack.us" target="_blank" style="color:var(--gold)">GovTrack</a>
     </div>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// REPORT CARD ENGINE
+// Accountability-focused: high PAC funding & missed votes = lower grade
+// Weights: Attendance 30 | Independence 25 | PAC cleanliness 25 | Tenure 20
+// ═══════════════════════════════════════════════════════
+
+function calcReportCard(m) {
+  const details = [];
+  let   total   = 0;
+  let   weight  = 0;
+
+  // ── 1. ATTENDANCE (30 pts) — lower missed votes = better ──────────────────
+  const missed = m.govtrackMissedPct != null ? m.govtrackMissedPct
+               : (typeof m.missedVotesPct === 'number' ? m.missedVotesPct : null);
+  if (missed != null) {
+    const pts = Math.max(0, 30 - (missed / 10) * 30);
+    details.push({ label:'Attendance', score:pts, max:30,
+      display: missed.toFixed(1)+'% missed', fill:pts/30,
+      color: pts>=24?'#16a34a':pts>=15?'#d97706':'#dc2626' });
+    total += pts; weight += 30;
+  }
+
+  // ── 2. INDEPENDENCE (25 pts) — lower party-line % = more independent ──────
+  const partyLine = m.govtrackPartyPct != null ? m.govtrackPartyPct
+                  : (typeof m.votesWithParty === 'number' ? m.votesWithParty : null);
+  if (partyLine != null) {
+    const pts = Math.max(0, ((100 - partyLine) / 50) * 25);
+    details.push({ label:'Independence', score:pts, max:25,
+      display: partyLine.toFixed(1)+'% w/ party', fill:pts/25,
+      color: pts>=18?'#16a34a':pts>=10?'#d97706':'#dc2626' });
+    total += pts; weight += 25;
+  }
+
+  // ── 3. PAC CLEANLINESS (25 pts) — lower PAC % = cleaner ──────────────────
+  const pacStr = m.reportCardPacPct;
+  if (pacStr != null && pacStr !== '—') {
+    const pacPct = parseFloat(pacStr);
+    if (!isNaN(pacPct)) {
+      const pts = Math.max(0, 25 - (pacPct / 50) * 25);
+      details.push({ label:'PAC Funding', score:pts, max:25,
+        display: pacPct.toFixed(1)+'% from PACs', fill:pts/25,
+        color: pts>=20?'#16a34a':pts>=12?'#d97706':'#dc2626' });
+      total += pts; weight += 25;
+    }
+  }
+
+  // ── 4. TENURE (20 pts) — longer = more experienced ───────────────────────
+  const years = m.yearsInOffice
+    || (m.startDate ? new Date().getFullYear() - parseInt(m.startDate) : null);
+  if (years != null && years >= 0) {
+    const pts = Math.min(20, 5 + (years / 20) * 15);
+    details.push({ label:'Tenure', score:pts, max:20,
+      display: years+' yrs in office', fill:pts/20, color:'#1a3a5c' });
+    total += pts; weight += 20;
+  }
+
+  if (!details.length) return null;
+  const normalized = weight > 0 ? Math.round((total / weight) * 100) : 0;
+  const grade = normalized>=90?'A':normalized>=75?'B':normalized>=60?'C':normalized>=45?'D':'F';
+  return { score:normalized, grade, details, available:details.length };
+}
+
+function renderReportCard(m) {
+  const rc = calcReportCard(m);
+  if (!rc) return `
+    <div class="rc-wrap" style="margin-bottom:16px">
+      <div class="rc-title">Accountability Score</div>
+      <div class="rc-unavail">Score unavailable — open <strong>Voting Record</strong> and
+        <strong>Campaign Finance</strong> tabs first to load the required data.</div>
+    </div>`;
+
+  const gradeDesc = {A:'Excellent accountability',B:'Good accountability',
+    C:'Mixed record',D:'Below average',F:'Poor accountability'};
+  m.reportCardGrade = rc.grade;
+  m.reportCardScore = rc.score;
+
+  return `
+  <div class="rc-wrap">
+    <div class="rc-header">
+      <div>
+        <div class="rc-title">Accountability Score</div>
+        <div style="font-family:var(--mono);font-size:0.6rem;color:var(--silver);margin-top:3px">
+          ${rc.available<3?'⚠ Partial — open Voting Record &amp; Finance tabs for full score':'Based on '+rc.available+' metrics'}
+        </div>
+      </div>
+      <div class="rc-grade-block">
+        <div class="rc-grade ${rc.grade}">${rc.grade}</div>
+        <div class="rc-score-wrap">
+          <div class="rc-score-label">Score</div>
+          <div class="rc-score-val">${rc.score}/100</div>
+        </div>
+      </div>
+    </div>
+    <div class="rc-rows">
+      ${rc.details.map(d=>`
+        <div class="rc-row">
+          <div class="rc-row-label">${d.label}</div>
+          <div class="rc-track"><div class="rc-fill" style="width:${Math.round(d.fill*100)}%;background:${d.color}"></div></div>
+          <div class="rc-row-val">${d.display}</div>
+        </div>`).join('')}
+    </div>
+    <div style="font-family:var(--mono);font-size:0.58rem;color:var(--silver);margin-top:12px;line-height:1.7">
+      ${gradeDesc[rc.grade]} · Weights: Attendance 30%, Independence 25%, PAC Funding 25%, Tenure 20%
+    </div>
+  </div>`;
+}
+
+function cardGradeBadge(m) {
+  if (!m.reportCardGrade) return '';
+  return `<span class="card-grade ${m.reportCardGrade}" title="Accountability Grade: ${m.reportCardGrade} (${m.reportCardScore}/100)">${m.reportCardGrade}</span>`;
+}
+
+function storeFinanceForReportCard(m, finData) {
+  if (!finData) return;
+  m.reportCardPacPct = finData.pacPct;
+  const panel = document.getElementById('panel-overview');
+  if (panel?.classList.contains('active') && currentMember?.id === m.id) renderOverview(m);
+}
+
+// ═══════════════════════════════════════════════════════
+// TRENDING — localStorage hit counter
+// ═══════════════════════════════════════════════════════
+const TRENDING_KEY = 'capital-index-trending-v1';
+
+function getTrending() {
+  try { return JSON.parse(localStorage.getItem(TRENDING_KEY) || '{}'); }
+  catch(e) { return {}; }
+}
+
+function recordView(bioguideId) {
+  try {
+    const t = getTrending();
+    t[bioguideId] = (t[bioguideId] || 0) + 1;
+    localStorage.setItem(TRENDING_KEY, JSON.stringify(t));
+    renderTrending();
+  } catch(e) { /* private mode — ignore */ }
+}
+
+function clearTrending() {
+  try { localStorage.removeItem(TRENDING_KEY); } catch(e) {}
+  renderTrending();
+}
+
+function renderTrending() {
+  const section = document.getElementById('trending-section');
+  const grid    = document.getElementById('trending-grid');
+  if (!section || !grid) return;
+
+  const hits   = getTrending();
+  const sorted = Object.entries(hits).sort((a,b)=>b[1]-a[1]).slice(0,8);
+
+  if (!sorted.length || !allMembers.length) { section.style.display='none'; return; }
+
+  section.style.display = 'block';
+  grid.innerHTML = sorted.map(([id,views],i) => {
+    const m = allMembers.find(x=>x.id===id||x.bioguideId===id);
+    if (!m) return '';
+    const gradeHtml = m.reportCardGrade
+      ? `<span class="card-grade ${m.reportCardGrade}" style="font-size:0.7rem;padding:1px 5px">${m.reportCardGrade}</span>` : '';
+    return `
+      <div class="trending-card" onclick="openProfile('${m.id}')" role="button" tabindex="0"
+        onkeydown="if(event.key==='Enter')openProfile('${m.id}')">
+        <div class="trending-rank">${i+1}</div>
+        ${m.depiction
+          ? `<img src="${m.depiction}" style="width:36px;height:44px;object-fit:cover;object-position:top;border:1px solid var(--border);flex-shrink:0" loading="lazy" onerror="this.style.display='none'">`
+          : `<div style="width:36px;height:44px;background:var(--cream);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:0.8rem;color:var(--silver);flex-shrink:0">${m.firstName?.[0]||''}${m.lastName?.[0]||''}</div>`}
+        <div class="trending-info">
+          <div style="display:flex;align-items:center;gap:5px">
+            <div class="trending-name">${m.name}</div>
+            ${gradeHtml}
+          </div>
+          <div class="trending-meta">${m.title} · ${m.state}</div>
+        </div>
+        <div class="trending-views">${views}×</div>
+      </div>`;
+  }).join('');
 }
 
 // ═══════════════════════════════════════════════════════
