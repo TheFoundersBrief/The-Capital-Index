@@ -1623,11 +1623,17 @@ async function enrichAndRender(m) {
     m.youtubeId = d.youtubeAccount || null;
     m.facebookId= d.facebookAccount || null;
     m.fecId     = null; // Congress.gov doesn't provide FEC ID directly
-    m.committees = (d.terms?.item || [])
+    // Only overwrite committees from detail API if it returned real data —
+    // prefetchCommittees() populates them from the unitedstates.github.io bulk
+    // files which are far more complete. Overwriting with an empty array would
+    // break committee search in the Discover sidebar.
+    const detailCommittees = (d.terms?.item || [])
       .flatMap(t => t.committees || [])
       .map(c => c.name)
       .filter((v,i,a) => a.indexOf(v) === i)
       .slice(0, 8);
+    if (detailCommittees.length) m.committees = detailCommittees;
+    // else: preserve whatever prefetchCommittees() already set
 
     // Compute years in office from first term
     const terms = d.terms?.item || [];
@@ -3278,7 +3284,7 @@ let committeePrefetchDone = false;
 
 async function prefetchCommittees() {
   if (committeePrefetchDone) return;
-  committeePrefetchDone = true;
+  committeePrefetchDone = true; // set eagerly to prevent parallel calls
 
   const BASE = 'https://unitedstates.github.io/congress-legislators';
 
@@ -3335,7 +3341,7 @@ async function prefetchCommittees() {
 
   } catch(e) {
     console.warn('Committee prefetch failed:', e);
-    // Fall back to the per-member approach for anyone who opens the discover panel
+    committeePrefetchDone = false; // allow retry on next open
   }
 }
 
