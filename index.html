@@ -3302,6 +3302,13 @@ async function prefetchCommittees() {
     const committeesRaw = await committeesRes.json();
     console.log('[Committees] membership keys:', Object.keys(membershipRaw).length);
     console.log('[Committees] committees count:', Array.isArray(committeesRaw) ? committeesRaw.length : typeof committeesRaw);
+    // Sample first membership entry to see actual field names + values
+    const firstCode = Object.keys(membershipRaw)[0];
+    const firstEntry = membershipRaw[firstCode][0];
+    console.log('[Committees] sample membership entry fields:', Object.keys(firstEntry));
+    console.log('[Committees] sample bioguide_id value:', firstEntry.bioguide_id);
+    // Sample allMembers bioguideId
+    console.log('[Committees] sample allMembers bioguideId:', allMembers[0]?.bioguideId, '| id:', allMembers[0]?.id);
 
     // Build committeeCode -> full name lookup
     // committees-current.json is an array of objects
