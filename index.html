@@ -4,9 +4,25 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Congressional Index — The Founders Brief</title>
-<meta name="description" content="A searchable index of all U.S. congressional representatives and senators. Track legislation, campaign finance, and voting records.">
-<meta property="og:title" content="Congressional Index — The Founders Brief">
-<meta property="og:description" content="Search every member of the 119th Congress. View legislation, campaign contributions, and voting records.">
+<meta name="description" content="A searchable index of all 538 members of the 119th U.S. Congress. Track votes, campaign finance, stock trades, and more.">
+<meta name="theme-color" content="#0a0a0f">
+<meta name="robots" content="index, follow">
+<!-- Open Graph -->
+<meta property="og:type"        content="website">
+<meta property="og:url"         content="https://thefoundersbrief.github.io/The-Capital-Index/">
+<meta property="og:title"       content="The Capital Index — Congressional Accountability">
+<meta property="og:description" content="Track every vote, donor, and stock trade for all 538 members of Congress. Free, live data. No spin.">
+<meta property="og:image"       content="https://thefoundersbrief.github.io/The-Capital-Index/og-image.png">
+<meta property="og:image:width"  content="1200">
+<meta property="og:image:height" content="630">
+<!-- Twitter Card -->
+<meta name="twitter:card"        content="summary_large_image">
+<meta name="twitter:site"        content="@TheFoundersBrief">
+<meta name="twitter:title"       content="The Capital Index — Congressional Accountability">
+<meta name="twitter:description" content="Track every vote, donor, and stock trade for all 538 members of Congress. Free, live data. No spin.">
+<meta name="twitter:image"       content="https://thefoundersbrief.github.io/The-Capital-Index/og-image.png">
+<!-- Favicon (inline SVG) -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%230a0a0f'/><rect x='0' y='0' width='4' height='32' fill='%23b8952a'/><text x='10' y='24' font-family='Georgia,serif' font-size='20' font-weight='900' fill='white'>CI</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -406,27 +422,100 @@
   footer a { color: var(--gold); text-decoration: none; }
   footer a:hover { text-decoration: underline; }
 
+  /* ── ABOUT MODAL ── */
+  .about-overlay { display:none; position:fixed; inset:0; background:rgba(10,10,15,0.88); z-index:2500; overflow-y:auto; padding:32px 20px; align-items:flex-start; justify-content:center; }
+  .about-overlay.open { display:flex; }
+  .about-modal { background:var(--paper); width:100%; max-width:780px; animation:slideUp 0.25s ease; }
+  .about-header { background:var(--ink); color:white; padding:28px 36px; display:flex; align-items:center; justify-content:space-between; }
+  .about-body { padding:32px 36px; overflow-y:auto; max-height:70vh; }
+  .about-section { margin-bottom:28px; padding-bottom:28px; border-bottom:1px solid var(--border); }
+  .about-section:last-child { border-bottom:none; margin-bottom:0; }
+  .about-section h3 { font-family:var(--serif); font-size:1.1rem; font-weight:700; color:var(--ink); margin-bottom:10px; }
+  .about-section p { font-family:var(--sans); font-size:0.86rem; color:#555; line-height:1.8; }
+  .about-sources { display:flex; flex-direction:column; gap:14px; }
+  .about-source-item { background:white; border:1px solid var(--border); padding:14px 18px; }
+  .about-source-name { font-family:var(--mono); font-size:0.72rem; font-weight:600; color:var(--blue); text-transform:uppercase; letter-spacing:1px; margin-bottom:5px; }
+  .about-source-desc { font-family:var(--sans); font-size:0.82rem; color:#555; line-height:1.7; }
+  .about-source-desc a { color:var(--gold); }
+  .about-footer-btn { background:none; border:none; color:var(--gold); font-family:var(--mono); font-size:0.65rem; cursor:pointer; padding:0; text-decoration:underline; margin-top:6px; }
+  .about-footer-btn:hover { color:white; }
+
+  /* ── COMPARE QUICK-START ── */
+  .compare-quickstart { padding:16px 32px 0; background:var(--blue); }
+  .compare-qs-label { font-family:var(--mono); font-size:0.6rem; letter-spacing:2px; text-transform:uppercase; color:#7a9cc0; margin-bottom:8px; }
+  .compare-qs-pills { display:flex; flex-wrap:wrap; gap:6px; }
+  .compare-qs-pill { padding:5px 12px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.18); color:rgba(255,255,255,0.8); font-family:var(--mono); font-size:0.65rem; cursor:pointer; transition:all 0.18s; white-space:nowrap; }
+  .compare-qs-pill:hover { background:rgba(255,255,255,0.2); color:white; border-color:var(--gold); }
+
+  /* ── SKELETON LOADER ── */
+  @keyframes shimmer { 0%{background-position:-400px 0} 100%{background-position:400px 0} }
+  .skel { background: linear-gradient(90deg, var(--cream) 25%, #e8e3d8 50%, var(--cream) 75%);
+    background-size: 800px 100%; animation: shimmer 1.4s infinite; border-radius: 2px; }
+  .member-card-skeleton { background: white; border: 1px solid var(--border); padding: 20px; }
+  .skel-top { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 14px; }
+  .skel-photo { width: 60px; height: 72px; flex-shrink: 0; }
+  .skel-info { flex: 1; }
+  .skel-badge { height: 18px; width: 70px; margin-bottom: 10px; }
+  .skel-name  { height: 20px; width: 80%; margin-bottom: 6px; }
+  .skel-role  { height: 14px; width: 55%; }
+  .skel-meta  { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+  .skel-meta-item { height: 38px; }
+  .skel-footer { height: 14px; width: 40%; margin-top: 4px; }
+
+  /* ── MOBILE NAV ── */
+  .nav-hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 8px; }
+  .nav-hamburger span { display: block; width: 22px; height: 2px; background: rgba(255,255,255,0.7); transition: all 0.2s; }
+  .nav-mobile-menu { display: none; }
+
   /* ── RESPONSIVE ── */
   @media (max-width: 900px) {
     .masthead-inner { padding: 20px; flex-direction: column; align-items: flex-start; gap: 10px; }
     .masthead-title { font-size: 2rem; }
     .masthead-meta { display: none; }
-    .container { padding: 0 20px; }
-    .nav-bar { padding: 0 20px; }
+    .container { padding: 0 16px; }
+    .nav-bar { padding: 0 16px; }
+    .nav-bar-inner { flex-wrap: wrap; }
     .nav-right { display: none; }
+    /* Collapse party tabs on mobile — keep chamber tabs only */
+    .nav-tab[data-view="D"],
+    .nav-tab[data-view="R"],
+    .nav-tab[data-view="I"] { display: none; }
+    .nav-tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+    .nav-tabs::-webkit-scrollbar { display: none; }
+    .zip-toggle { font-size: 0.65rem; padding: 10px 8px; }
     .search-row { flex-wrap: wrap; }
     .filter-select { min-width: 120px; flex: 1; }
-    .stats-bar { flex-wrap: wrap; gap: 16px; padding: 16px 0; }
-    .stat-item { border-right: none; margin-right: 0; padding-right: 16px; }
+    .stats-bar { flex-wrap: wrap; gap: 12px; padding: 12px 0; }
+    .stat-item { border-right: none; margin-right: 0; padding-right: 12px; }
+    .stat-num { font-size: 1.5rem; }
     .info-grid { grid-template-columns: 1fr 1fr; }
     .finance-grid { grid-template-columns: 1fr 1fr; }
     .profile-header { grid-template-columns: 1fr; }
+    .ph-party-block { flex-direction: row; width: 100%; justify-content: flex-start; padding: 10px 16px; gap: 12px; }
     .ph-name { font-size: 1.8rem; }
-    .profile-content { padding: 20px; }
+    .profile-tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+    .profile-tabs::-webkit-scrollbar { display: none; }
+    .profile-tab { white-space: nowrap; }
+    .profile-content { padding: 16px; }
     .contact-grid { grid-template-columns: 1fr; }
     .bill-item { grid-template-columns: 60px 1fr; }
     .bill-status { grid-column: 2; }
-    footer { padding: 24px 20px; }
+    .votes-stats-grid { grid-template-columns: 1fr 1fr; }
+    .compare-selectors { grid-template-columns: 1fr; padding: 16px; }
+    .compare-vs { display: none; }
+    .compare-results { padding: 16px; }
+    footer { padding: 24px 16px; }
+    .footer-inner { flex-direction: column; gap: 20px; }
+  }
+
+  @media (max-width: 480px) {
+    .masthead-title { font-size: 1.6rem; }
+    .members-grid { grid-template-columns: 1fr; }
+    .nav-tab { padding: 12px 14px; font-size: 0.65rem; }
+    .ph-name { font-size: 1.5rem; }
+    .info-grid { grid-template-columns: 1fr; }
+    .finance-grid { grid-template-columns: 1fr; }
+    .votes-stats-grid { grid-template-columns: 1fr; }
   }
 </style>
 </head>
@@ -640,6 +729,17 @@
       <button class="compare-close" onclick="closeCompare()">✕</button>
     </div>
 
+    <!-- Quick-start suggestions -->
+    <div class="compare-quickstart">
+      <div class="compare-qs-label">Quick comparisons</div>
+      <div class="compare-qs-pills" id="compare-qs-pills">
+        <span class="compare-qs-pill" onclick="loadQuickstart('bernie')">Sanders vs. McConnell</span>
+        <span class="compare-qs-pill" onclick="loadQuickstart('leaders')">House Leaders</span>
+        <span class="compare-qs-pill" onclick="loadQuickstart('freshmen')">Freshman Members</span>
+        <span class="compare-qs-pill" onclick="loadQuickstart('independents')">Independents</span>
+      </div>
+    </div>
+
     <!-- Member selectors -->
     <div class="compare-selectors">
       <div class="compare-selector-wrap">
@@ -668,22 +768,81 @@
   </div>
 </div>
 
+<!-- ── ABOUT MODAL ── -->
+<div class="about-overlay" id="about-overlay" onclick="if(event.target===this)closeAbout()">
+  <div class="about-modal">
+    <div class="about-header">
+      <div>
+        <div class="compare-eyebrow">The Capital Index</div>
+        <div class="compare-title">About This Data</div>
+      </div>
+      <button class="compare-close" onclick="closeAbout()">✕</button>
+    </div>
+    <div class="about-body">
+      <div class="about-section">
+        <h3>What is The Capital Index?</h3>
+        <p>The Capital Index is a free, open-access accountability tool that aggregates publicly available data on all 538 members of the 119th United States Congress. It is built and maintained by The Founders Brief and is not affiliated with any government agency.</p>
+      </div>
+      <div class="about-section">
+        <h3>Data Sources & Methodology</h3>
+        <div class="about-sources">
+          <div class="about-source-item">
+            <div class="about-source-name">Congress.gov API</div>
+            <div class="about-source-desc">Member profiles, sponsored legislation, committee assignments, and term data. Updated daily by the Library of Congress. <a href="https://api.congress.gov" target="_blank">api.congress.gov ↗</a></div>
+          </div>
+          <div class="about-source-item">
+            <div class="about-source-name">Federal Election Commission (FEC)</div>
+            <div class="about-source-desc">Campaign finance totals, donor breakdowns, and disbursements. FEC candidate matching uses last name + chamber + state. Some members may not match if name formats differ. <a href="https://www.fec.gov/data/" target="_blank">fec.gov/data ↗</a></div>
+          </div>
+          <div class="about-source-item">
+            <div class="about-source-name">GovTrack.us</div>
+            <div class="about-source-desc">Voting statistics including party-line vote percentage, missed votes, ideology scores, and leadership scores. Ideology scores range from −1 (most progressive) to +1 (most conservative) based on voting patterns, not self-identification. <a href="https://www.govtrack.us/about/analysis" target="_blank">GovTrack methodology ↗</a></div>
+          </div>
+          <div class="about-source-item">
+            <div class="about-source-name">Capitol Trades / 2iQ Research</div>
+            <div class="about-source-desc">STOCK Act trade disclosures. No public API is available; the site links directly to each member's Capitol Trades profile. <a href="https://www.capitoltrades.com" target="_blank">capitoltrades.com ↗</a></div>
+          </div>
+          <div class="about-source-item">
+            <div class="about-source-name">unitedstates/congress-legislators</div>
+            <div class="about-source-desc">Social media handles (Twitter/X, YouTube, Facebook) for members of Congress, maintained by the open-source @unitedstates project. <a href="https://github.com/unitedstates/congress-legislators" target="_blank">GitHub ↗</a></div>
+          </div>
+          <div class="about-source-item">
+            <div class="about-source-name">U.S. Census Bureau Geocoder</div>
+            <div class="about-source-desc">ZIP code to congressional district lookup for the "My Reps" feature. <a href="https://geocoding.geo.census.gov" target="_blank">census.gov ↗</a></div>
+          </div>
+        </div>
+      </div>
+      <div class="about-section">
+        <h3>Limitations</h3>
+        <p>All data is sourced from public government APIs and third-party aggregators. FEC candidate matching is best-effort and may occasionally link to the wrong candidate for members with common names. GovTrack ideology scores reflect voting patterns only and should not be taken as a definitive political characterization. Stock trade data is self-reported by members and may be delayed up to 45 days by law.</p>
+      </div>
+      <div class="about-section">
+        <h3>Built By</h3>
+        <p>The Capital Index is a project of <strong>The Founders Brief</strong>, an independent civic technology publication. We are not affiliated with any political party, government agency, or advocacy organization.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
 <footer>
   <div class="footer-inner">
     <div>
       <div class="footer-brand">The Founders Brief</div>
-      Congressional Index · 119th Congress<br>
-      For informational purposes. All data publicly available.
+      Congressional Index · 119th Congress · 2025–2027<br>
+      For informational purposes. All data publicly available.<br>
+      <button class="about-footer-btn" onclick="openAbout()">About This Data & Methodology ↗</button>
     </div>
     <div>
       Data Sources<br>
       <a href="https://api.congress.gov" target="_blank">Congress.gov API</a><br>
       <a href="https://www.fec.gov/data/" target="_blank">FEC.gov Open Data</a><br>
-      <a href="https://www.congress.gov" target="_blank">Congress.gov</a>
+      <a href="https://www.govtrack.us" target="_blank">GovTrack.us</a><br>
+      <a href="https://www.capitoltrades.com" target="_blank">Capitol Trades</a><br>
+      <a href="https://github.com/unitedstates/congress-legislators" target="_blank">unitedstates/congress-legislators</a>
     </div>
     <div>
       Not affiliated with any government agency.<br>
-      Data refreshed periodically.<br>
+      Data refreshed periodically from public APIs.<br>
       &copy; <span id="yr"></span> The Founders Brief
     </div>
   </div>
@@ -721,11 +880,31 @@ document.addEventListener('DOMContentLoaded', () => {
 // ═══════════════════════════════════════════════════════
 // LOAD MEMBERS — paginate through Congress.gov via proxy
 // ═══════════════════════════════════════════════════════
+const CACHE_KEY     = 'capital-index-members-v2';
+const CACHE_MAX_AGE = 60 * 60 * 1000; // 1 hour in ms
+
 async function loadAllMembers() {
-  showGridLoading('Fetching congressional data…');
+  showSkeletonGrid();
+
+  // ── Try session cache first ────────────────────────────────────────────────
   try {
-    // Congress.gov /v3/member returns up to 250 per call
-    // Fetch two pages to cover all ~535 members
+    const cached = sessionStorage.getItem(CACHE_KEY);
+    if (cached) {
+      const { members, social, ts } = JSON.parse(cached);
+      if (Date.now() - ts < CACHE_MAX_AGE && members?.length) {
+        socialMediaMap = social || {};
+        allMembers = members;
+        updateStats();
+        applyFilters();
+        document.getElementById('nav-status').textContent =
+          `${allMembers.length} members loaded`;
+        return;
+      }
+    }
+  } catch(e) { /* ignore cache errors */ }
+
+  // ── Fetch fresh data ───────────────────────────────────────────────────────
+  try {
     const [page1, page2, socialRaw] = await Promise.all([
       apiFetch('/v3/member?limit=250&offset=0&currentMember=true'),
       apiFetch('/v3/member?limit=250&offset=250&currentMember=true'),
@@ -733,7 +912,6 @@ async function loadAllMembers() {
         .then(r => r.json()).catch(() => []),
     ]);
 
-    // Build bioguideId → social media lookup
     for (const s of socialRaw) {
       const id = s.id?.bioguide;
       if (id) socialMediaMap[id] = {
@@ -743,10 +921,7 @@ async function loadAllMembers() {
       };
     }
 
-    const raw1 = page1?.members || [];
-    const raw2 = page2?.members || [];
-    const combined = [...raw1, ...raw2];
-
+    const combined = [...(page1?.members || []), ...(page2?.members || [])];
     if (!combined.length) throw new Error('No members returned from API.');
 
     allMembers = combined.map(normalizeCongressMember).filter(m => m.name);
@@ -754,6 +929,13 @@ async function loadAllMembers() {
     applyFilters();
     document.getElementById('nav-status').textContent =
       `${allMembers.length} members loaded`;
+
+    // ── Cache for this session ───────────────────────────────────────────────
+    try {
+      sessionStorage.setItem(CACHE_KEY, JSON.stringify({
+        members: allMembers, social: socialMediaMap, ts: Date.now()
+      }));
+    } catch(e) { /* storage full or private mode — ignore */ }
 
   } catch(err) {
     console.error(err);
@@ -765,6 +947,28 @@ async function loadAllMembers() {
         <code>CONGRESS_API_KEY</code> secret is set. Check the browser console for details.
       </div>`;
   }
+}
+
+function showSkeletonGrid() {
+  const skeleton = Array(12).fill(0).map(() => `
+    <div class="member-card-skeleton">
+      <div class="skel-top">
+        <div class="skel skel-photo"></div>
+        <div class="skel-info">
+          <div class="skel skel-badge"></div>
+          <div class="skel skel-name"></div>
+          <div class="skel skel-role"></div>
+        </div>
+      </div>
+      <div class="skel-meta">
+        <div class="skel skel-meta-item"></div>
+        <div class="skel skel-meta-item"></div>
+        <div class="skel skel-meta-item"></div>
+        <div class="skel skel-meta-item"></div>
+      </div>
+      <div class="skel skel-footer"></div>
+    </div>`).join('');
+  document.getElementById('members-grid').innerHTML = skeleton;
 }
 
 // ═══════════════════════════════════════════════════════
@@ -946,11 +1150,16 @@ function renderGrid() {
   }
 
   grid.innerHTML = slice.map(m => `
-    <div class="member-card ${m.party}" onclick="openProfile('${m.id}')">
+    <article class="member-card ${m.party}"
+      tabindex="0"
+      role="button"
+      aria-label="View profile for ${m.name}, ${m.title} from ${stateName(m.state)}"
+      onclick="openProfile('${m.id}')"
+      onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openProfile('${m.id}')}">
       <div class="member-card-top">
         ${m.depiction
-          ? `<img class="member-photo" src="${m.depiction}" alt="${m.name}" onerror="this.style.display='none'">`
-          : `<div class="member-photo-placeholder">${m.firstName?m.firstName[0]:'?'}${m.lastName?m.lastName[0]:''}</div>`}
+          ? `<img class="member-photo" src="${m.depiction}" alt="Official portrait of ${m.name}" loading="lazy" onerror="this.style.display='none'">`
+          : `<div class="member-photo-placeholder" aria-hidden="true">${m.firstName?m.firstName[0]:'?'}${m.lastName?m.lastName[0]:''}</div>`}
         <div class="member-card-top-info">
           <div class="member-party-badge ${m.party}">${partyLabel(m.party)}</div>
           <div class="member-name">${m.name}</div>
@@ -966,7 +1175,7 @@ function renderGrid() {
       <div class="member-card-footer">
         <span class="view-link">View Full Profile →</span>
       </div>
-    </div>
+    </article>
   `).join('');
 
   renderPagination();
@@ -1024,19 +1233,24 @@ function showGridLoading(msg) {
 // ═══════════════════════════════════════════════════════
 // OPEN PROFILE
 // ═══════════════════════════════════════════════════════
-async function openProfile(id) {
+async function openProfile(id, tab = 'overview') {
   const m = allMembers.find(x => x.id === id);
   if (!m) return;
   currentMember = m;
   allBills = [];
 
+  // Update URL hash for deep-linking
+  history.replaceState(null, '', `#${id}${tab !== 'overview' ? '/' + tab : ''}`);
+
   // Populate header immediately with what we have
   renderProfileHeader(m);
   renderOverview(m);
 
-  // Reset tabs
-  document.querySelectorAll('.profile-tab').forEach((t,i) => t.classList.toggle('active', i===0));
-  document.querySelectorAll('.profile-panel').forEach((p,i) => p.classList.toggle('active', i===0));
+  // Reset tabs — activate requested tab
+  const tabNames = ['overview','bills','finance','votes','trades','contact'];
+  const tabIdx   = tabNames.indexOf(tab);
+  document.querySelectorAll('.profile-tab').forEach((t,i) => t.classList.toggle('active', i === Math.max(0, tabIdx)));
+  document.querySelectorAll('.profile-panel').forEach((p,i) => p.classList.toggle('active', i === Math.max(0, tabIdx)));
 
   document.getElementById('modal-overlay').classList.add('open');
   document.body.style.overflow = 'hidden';
@@ -1151,21 +1365,21 @@ function renderProfileHeader(m) {
 // ═══════════════════════════════════════════════════════
 function renderOverview(m) {
   const cells = [
-    { label: 'State',           val: stateName(m.state),                     sub: m.state },
-    { label: 'Party',           val: partyFull(m.party),                     sub: '' },
-    { label: 'Chamber',         val: m.chamber,                              sub: '' },
-    { label: 'In Office Since', val: m.startDate ? m.startDate.substring(0,4) : '—', sub: m.startDate || '' },
-    { label: 'Term Ends',       val: m.termEnd || '—',                       sub: '' },
-    { label: 'Next Election',   val: m.nextElection || '—',                  sub: '' },
-    { label: 'Years in Office', val: m.startDate ? (new Date().getFullYear() - parseInt(m.startDate)) + ' yrs' : (m.yearsInOffice ? m.yearsInOffice + ' yrs' : '—'), sub: '' },
-    { label: 'District',        val: m.district || (m.chamber === 'Senate' ? 'State-Wide' : '—'), sub: '' },
-    { label: 'Sponsored Bills', val: allBills.filter(b=>b.role==='sponsored').length || '—', sub: 'Via Congress.gov' },
+    { label: 'State',           val: stateName(m.state),                     sub: m.state,         source: 'Congress.gov' },
+    { label: 'Party',           val: partyFull(m.party),                     sub: '',              source: 'Congress.gov' },
+    { label: 'Chamber',         val: m.chamber,                              sub: '',              source: 'Congress.gov' },
+    { label: 'In Office Since', val: m.startDate ? m.startDate.substring(0,4) : '—', sub: m.startDate || '', source: 'Congress.gov' },
+    { label: 'Term Ends',       val: m.termEnd || '—',                       sub: '',              source: 'Congress.gov' },
+    { label: 'Next Election',   val: m.nextElection || '—',                  sub: '',              source: 'Congress.gov' },
+    { label: 'Years in Office', val: m.startDate ? (new Date().getFullYear() - parseInt(m.startDate)) + ' yrs' : (m.yearsInOffice ? m.yearsInOffice + ' yrs' : '—'), sub: '', source: 'Congress.gov' },
+    { label: 'District',        val: m.district || (m.chamber === 'Senate' ? 'State-Wide' : '—'), sub: '', source: 'Congress.gov' },
+    { label: 'Sponsored Bills', val: allBills.filter(b=>b.role==='sponsored').length || '—',      sub: '',              source: 'Congress.gov' },
   ];
 
   document.getElementById('overview-grid').innerHTML =
     cells.map(c => `
-      <div class="info-cell">
-        <label>${c.label}</label>
+      <div class="info-cell" ${c.source ? `title="Source: ${c.source}" style="cursor:help"` : ''}>
+        <label>${c.label}${c.source ? ' <span style=\'font-size:0.55rem;color:var(--silver);font-weight:400\'>via ' + c.source + '</span>' : ''}</label>
         <div class="val">${c.val}</div>
         ${c.sub ? `<div class="val-sub">${c.sub}</div>` : ''}
       </div>`).join('');
@@ -1339,6 +1553,26 @@ async function renderFinance(m) {
   const opensecUrl    = `https://www.opensecrets.org/members-of-congress/summary?name=${encodeURIComponent(m.name)}`;
   const govtrackUrl   = `https://www.govtrack.us/congress/members/${m.bioguideId}`;
 
+  const fecFallback = m => `
+    <div style="grid-column:1/-1;background:white;border:1px solid var(--border);padding:20px 24px;font-family:var(--sans);font-size:0.86rem;color:var(--silver);line-height:1.8">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#b8952a" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <strong style="color:var(--ink);font-size:0.88rem">FEC data not available for ${m.name}</strong>
+      </div>
+      This can happen when a member's name doesn't match an active FEC filing, or when they are a new member without a full campaign cycle on record.
+      Full campaign finance records are available directly on FEC.gov:
+      <div style="margin-top:12px">
+        <a href="https://www.fec.gov/data/search/?query=${encodeURIComponent(m.name)}&data_type=processed" target="_blank"
+           style="display:inline-block;padding:8px 16px;background:var(--blue);color:white;font-family:var(--mono);font-size:0.72rem;text-decoration:none;margin-right:8px">
+          Search FEC.gov ↗
+        </a>
+        <a href="https://www.opensecrets.org/members-of-congress?name=${encodeURIComponent(m.name)}" target="_blank"
+           style="display:inline-block;padding:8px 16px;border:1px solid var(--border);color:var(--ink);font-family:var(--mono);font-size:0.72rem;text-decoration:none">
+          OpenSecrets ↗
+        </a>
+      </div>
+    </div>`;
+
   document.getElementById('finance-grid').innerHTML = cards.length
     ? cards.map(c => `
         <div class="finance-card">
@@ -1346,13 +1580,7 @@ async function renderFinance(m) {
           <div class="finance-amount">${c.val}</div>
           <div class="finance-cycle">${c.note}</div>
         </div>`).join('')
-    : `<div style="grid-column:1/-1;padding:28px 0 8px;font-family:var(--mono);font-size:0.8rem;color:var(--silver);line-height:1.8">
-        <strong style="color:var(--ink);font-size:0.85rem">Live FEC data requires a Worker update.</strong><br>
-        To enable: get a free API key at <a href="https://api.data.gov/signup/" target="_blank" style="color:var(--blue)">api.data.gov/signup</a>,
-        add it as <code>FEC_API_KEY</code> in your Cloudflare Worker, and update the Worker script to proxy
-        <code>/fec/*</code> paths to <code>https://api.open.fec.gov/v1/*</code>.<br><br>
-        In the meantime, full campaign finance data is one click away:
-      </div>`;
+    : fecFallback(m);
 
   // External links — always shown
   document.getElementById('donors-body').innerHTML = `
@@ -1421,6 +1649,11 @@ function switchTab(name, el) {
   el.classList.add('active');
   document.querySelectorAll('.profile-panel').forEach(p => p.classList.remove('active'));
   document.getElementById('panel-' + name).classList.add('active');
+  // Update URL hash
+  if (currentMember) {
+    const hashTab = name === 'overview' ? '' : '/' + name;
+    history.replaceState(null, '', `#${currentMember.bioguideId}${hashTab}`);
+  }
 
   if (name === 'votes' && currentMember) {
     loadVotes(currentMember);
@@ -1457,8 +1690,23 @@ function closeModal() {
   allBills = [];
   document.getElementById('trades-content').innerHTML = '';
   document.getElementById('votes-content').innerHTML = '';
+  history.replaceState(null, '', window.location.pathname);
 }
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal(); closeShareCard(); } });
+
+// Handle direct deep-link on page load (e.g. from a shared URL)
+window.addEventListener('DOMContentLoaded', () => {
+  const hash = window.location.hash.slice(1);
+  if (hash) {
+    const [id, tab] = hash.split('/');
+    // Wait for member data to load before opening
+    const tryOpen = () => {
+      if (allMembers.length) { openProfile(id, tab); }
+      else setTimeout(tryOpen, 200);
+    };
+    setTimeout(tryOpen, 400);
+  }
+});
 
 // ═══════════════════════════════════════════════════════
 // HELPERS
@@ -2372,6 +2620,53 @@ function renderComparison(el, mA, dA, mB, dB) {
       <a href="https://www.govtrack.us" target="_blank" style="color:var(--gold)">GovTrack</a>
     </div>`;
 }
+
+// ═══════════════════════════════════════════════════════
+// ABOUT MODAL
+// ═══════════════════════════════════════════════════════
+function openAbout() {
+  document.getElementById('about-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeAbout() {
+  document.getElementById('about-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// ═══════════════════════════════════════════════════════
+// COMPARE QUICK-START PRESETS
+// ═══════════════════════════════════════════════════════
+function loadQuickstart(preset) {
+  if (!allMembers.length) return;
+
+  const find = (namePart) =>
+    allMembers.find(m => m.name.toLowerCase().includes(namePart.toLowerCase()));
+
+  let a = null, b = null;
+
+  if (preset === 'bernie') {
+    a = find('Sanders');
+    b = find('McConnell');
+  } else if (preset === 'leaders') {
+    // House Speaker vs House Minority Leader
+    a = find('Johnson') || find('McCarthy');
+    b = find('Jeffries') || find('Pelosi');
+  } else if (preset === 'freshmen') {
+    // Two most recently started members
+    const sorted = [...allMembers].sort((a,b) =>
+      parseInt(b.startDate||0) - parseInt(a.startDate||0));
+    a = sorted[0];
+    b = sorted[1];
+  } else if (preset === 'independents') {
+    const inds = allMembers.filter(m => m.party === 'I');
+    a = inds[0];
+    b = inds[1];
+  }
+
+  if (a) selectCompareMember('a', a.bioguideId);
+  if (b) selectCompareMember('b', b.bioguideId);
+}
+
 </script>
 </body>
 </html>
