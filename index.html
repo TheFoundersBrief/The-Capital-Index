@@ -422,6 +422,119 @@
   footer a { color: var(--gold); text-decoration: none; }
   footer a:hover { text-decoration: underline; }
 
+  /* ── DISCOVER SIDEBAR ── */
+  .discover-backdrop {
+    display: none; position: fixed; inset: 0;
+    background: rgba(10,10,15,0.55); z-index: 1800;
+    transition: opacity 0.25s;
+  }
+  .discover-backdrop.open { display: block; }
+
+  .discover-sidebar {
+    position: fixed; top: 0; right: -480px; width: 460px; max-width: 100vw;
+    height: 100vh; background: var(--paper);
+    border-left: 2px solid var(--border);
+    z-index: 1900; overflow-y: auto;
+    transition: right 0.3s cubic-bezier(0.4,0,0.2,1);
+    display: flex; flex-direction: column;
+  }
+  .discover-sidebar.open { right: 0; }
+
+  .discover-header {
+    background: var(--ink); color: white;
+    padding: 22px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 10;
+    flex-shrink: 0;
+  }
+  .discover-title { font-family: var(--serif); font-size: 1.5rem; font-weight: 700; color: white; }
+
+  .discover-section {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  .discover-section-label {
+    font-family: var(--mono); font-size: 0.62rem; text-transform: uppercase;
+    letter-spacing: 2px; color: var(--silver); margin-bottom: 12px; font-weight: 600;
+  }
+
+  /* Committee search */
+  .discover-committee-input {
+    width: 100%; padding: 10px 14px;
+    border: 1px solid var(--border); background: white;
+    font-family: var(--sans); font-size: 0.85rem; color: var(--ink);
+    outline: none;
+  }
+  .discover-committee-input:focus { border-color: var(--blue); }
+  .discover-committee-results { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; max-height: 320px; overflow-y: auto; }
+  .discover-empty { font-family: var(--mono); font-size: 0.72rem; color: var(--silver); padding: 12px 0; }
+  .discover-committee-group { margin-bottom: 4px; }
+  .discover-committee-group-name {
+    font-family: var(--mono); font-size: 0.6rem; text-transform: uppercase;
+    letter-spacing: 1.5px; color: var(--gold); padding: 6px 0 4px;
+    border-bottom: 1px solid var(--border); margin-bottom: 6px;
+  }
+
+  /* Member mini card (shared) */
+  .discover-member {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; background: white; border: 1px solid var(--border);
+    cursor: pointer; transition: border-color 0.15s, background 0.15s;
+  }
+  .discover-member:hover { border-color: var(--blue); background: #f8f6f0; }
+  .discover-member-photo {
+    width: 38px; height: 46px; object-fit: cover; object-position: top;
+    border: 1px solid var(--border); flex-shrink: 0;
+  }
+  .discover-member-placeholder {
+    width: 38px; height: 46px; background: var(--cream); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--serif); font-size: 0.85rem; color: var(--silver); flex-shrink: 0;
+  }
+  .discover-member-info { flex: 1; min-width: 0; }
+  .discover-member-name { font-family: var(--sans); font-size: 0.84rem; font-weight: 600; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .discover-member-role { font-family: var(--mono); font-size: 0.62rem; color: var(--silver); margin-top: 2px; }
+  .discover-member-badge {
+    font-family: var(--mono); font-size: 0.58rem; font-weight: 600;
+    padding: 2px 7px; letter-spacing: 0.5px;
+  }
+  .discover-member-badge.D { background: #dbeafe; color: #1e40af; }
+  .discover-member-badge.R { background: #fee2e2; color: #991b1b; }
+  .discover-member-badge.I { background: #fef3c7; color: #92400e; }
+
+  /* Ideology match bar */
+  .discover-match-wrap { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+  .discover-match-label { font-family: var(--mono); font-size: 0.58rem; color: var(--silver); white-space: nowrap; }
+  .discover-match-track { flex: 1; height: 4px; background: var(--cream); overflow: hidden; }
+  .discover-match-fill { height: 100%; background: var(--gold); }
+
+  /* Delegation sub-header */
+  .discover-chamber-label {
+    font-family: var(--mono); font-size: 0.58rem; text-transform: uppercase;
+    letter-spacing: 1.5px; color: var(--silver); padding: 8px 0 5px;
+    margin-bottom: 5px; border-bottom: 1px dotted var(--border);
+  }
+  .discover-members-list { display: flex; flex-direction: column; gap: 6px; }
+
+  /* Similar note */
+  .discover-similar-note {
+    font-family: var(--mono); font-size: 0.7rem; color: var(--silver);
+    margin-bottom: 10px; line-height: 1.6;
+  }
+
+  /* In-profile discover panel */
+  .profile-discover-wrap { padding: 0; }
+  .profile-discover-section { margin-bottom: 24px; }
+  .profile-discover-section-title {
+    font-family: var(--mono); font-size: 0.62rem; text-transform: uppercase;
+    letter-spacing: 2px; color: var(--silver); margin-bottom: 10px; font-weight: 600;
+    padding-bottom: 6px; border-bottom: 1px solid var(--border);
+  }
+
+  @media (max-width: 520px) {
+    .discover-sidebar { width: 100vw; }
+  }
+
   /* ── ABOUT MODAL ── */
   .about-overlay { display:none; position:fixed; inset:0; background:rgba(10,10,15,0.88); z-index:2500; overflow-y:auto; padding:32px 20px; align-items:flex-start; justify-content:center; }
   .about-overlay.open { display:flex; }
@@ -550,6 +663,7 @@
     <div style="display:flex;align-items:center;gap:12px">
       <div class="zip-toggle" id="zip-toggle" onclick="toggleZip()" title="Find your representatives">📍 My Reps</div>
       <div class="zip-toggle" onclick="openCompare()" title="Compare two members">⚖ Compare</div>
+      <div class="zip-toggle" onclick="openDiscover(null)" title="Discover members by state, committee, or ideology">🔍 Discover</div>
       <div class="nav-right" id="nav-status">Loading…</div>
     </div>
   </div>
@@ -635,6 +749,7 @@
       <div class="profile-tab" onclick="switchTab('votes',this)">Voting Record</div>
       <div class="profile-tab" onclick="switchTab('trades',this)">Stock Trades</div>
       <div class="profile-tab" onclick="switchTab('contact',this)">Contact &amp; Links</div>
+      <div class="profile-tab" onclick="switchTab('discover',this)">Similar &amp; Related</div>
     </div>
 
     <div class="profile-content">
@@ -692,6 +807,14 @@
 
       <div class="profile-panel" id="panel-contact">
         <div class="contact-grid" id="contact-grid"></div>
+      </div>
+
+      <div class="profile-panel" id="panel-discover">
+        <div id="panel-discover-content">
+          <div class="loading-state" style="padding:40px 20px">
+            <div class="loading-spinner"></div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -767,6 +890,47 @@
     </div>
   </div>
 </div>
+
+<!-- ── DISCOVER SIDEBAR ── -->
+<div class="discover-backdrop" id="discover-backdrop" onclick="closeDiscover()"></div>
+<aside class="discover-sidebar" id="discover-sidebar" aria-label="Discover members">
+
+  <div class="discover-header">
+    <div>
+      <div class="compare-eyebrow">The Capital Index</div>
+      <div class="discover-title">Discover</div>
+    </div>
+    <button class="compare-close" onclick="closeDiscover()" aria-label="Close discover panel">✕</button>
+  </div>
+
+  <!-- Committee search -->
+  <div class="discover-section">
+    <div class="discover-section-label">🏛 Search by Committee</div>
+    <div class="discover-committee-wrap">
+      <input class="discover-committee-input" id="discover-committee-input"
+        placeholder="e.g. Armed Services, Finance, Judiciary…"
+        oninput="filterByCommittee()"
+        autocomplete="off">
+      <div class="discover-committee-results" id="discover-committee-results">
+        <div class="discover-empty">Start typing a committee name above.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- State delegation -->
+  <div class="discover-section" id="discover-delegation-section" style="display:none">
+    <div class="discover-section-label">🗺 State Delegation</div>
+    <div id="discover-delegation-content"></div>
+  </div>
+
+  <!-- Similar members -->
+  <div class="discover-section" id="discover-similar-section" style="display:none">
+    <div class="discover-section-label">⚡ Similar Members</div>
+    <div class="discover-similar-note" id="discover-similar-note"></div>
+    <div id="discover-similar-content"></div>
+  </div>
+
+</aside>
 
 <!-- ── ABOUT MODAL ── -->
 <div class="about-overlay" id="about-overlay" onclick="if(event.target===this)closeAbout()">
@@ -1655,6 +1819,10 @@ function switchTab(name, el) {
     history.replaceState(null, '', `#${currentMember.bioguideId}${hashTab}`);
   }
 
+  if (name === 'discover' && currentMember) {
+    renderProfileDiscover(currentMember);
+    return;
+  }
   if (name === 'votes' && currentMember) {
     loadVotes(currentMember);
     return;
@@ -1815,6 +1983,10 @@ function renderVotes(el, member, person, role, votes) {
   const missedPct  = role?.missed_votes_pct     != null ? role.missed_votes_pct.toFixed(1)             : null;
   const ideology   = role?.ideology_score       != null ? parseFloat(role.ideology_score)              : null;
   const leadership = role?.leadership_score     != null ? (role.leadership_score * 100).toFixed(0)     : null;
+
+  // Store on member object for Discover similarity matching
+  if (ideology !== null) member.govtrackIdeology = ideology;
+  if (leadership !== null) member.govtrackLeadership = parseFloat(role.leadership_score);
 
   let ideologyLabel = '—', ideologyColor = 'var(--silver)';
   if (ideology !== null) {
@@ -2620,6 +2792,277 @@ function renderComparison(el, mA, dA, mB, dB) {
       <a href="https://www.govtrack.us" target="_blank" style="color:var(--gold)">GovTrack</a>
     </div>`;
 }
+
+// ═══════════════════════════════════════════════════════
+// DISCOVER SIDEBAR
+// ═══════════════════════════════════════════════════════
+let discoverContext = null; // member object or null for standalone
+
+function openDiscover(member) {
+  discoverContext = member || null;
+  document.getElementById('discover-sidebar').classList.add('open');
+  document.getElementById('discover-backdrop').classList.add('open');
+  document.body.style.overflow = 'hidden';
+
+  // Reset committee input
+  document.getElementById('discover-committee-input').value = '';
+  document.getElementById('discover-committee-results').innerHTML =
+    '<div class="discover-empty">Start typing a committee name above.</div>';
+
+  if (member) {
+    renderDelegation(member);
+    renderSimilar(member);
+  } else {
+    document.getElementById('discover-delegation-section').style.display = 'none';
+    document.getElementById('discover-similar-section').style.display = 'none';
+  }
+}
+
+function closeDiscover() {
+  document.getElementById('discover-sidebar').classList.remove('open');
+  document.getElementById('discover-backdrop').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// ── Committee search ─────────────────────────────────────────────
+function filterByCommittee() {
+  const query = document.getElementById('discover-committee-input').value.trim().toLowerCase();
+  const container = document.getElementById('discover-committee-results');
+
+  if (query.length < 2) {
+    container.innerHTML = '<div class="discover-empty">Start typing a committee name above.</div>';
+    return;
+  }
+
+  // Find all members whose committees include the query string
+  const matches = allMembers.filter(m =>
+    m.committees?.some(c => c.toLowerCase().includes(query))
+  );
+
+  if (!matches.length) {
+    container.innerHTML = '<div class="discover-empty">No members found with that committee assignment.<br><span style="font-size:0.65rem">Tip: committees load when a profile is opened — browse a few members first.</span></div>';
+    return;
+  }
+
+  // Group by matched committee name
+  const grouped = {};
+  for (const m of matches) {
+    const matchedCommittees = m.committees.filter(c => c.toLowerCase().includes(query));
+    for (const c of matchedCommittees) {
+      if (!grouped[c]) grouped[c] = [];
+      grouped[c].push(m);
+    }
+  }
+
+  const sortedKeys = Object.keys(grouped).sort();
+  container.innerHTML = sortedKeys.map(c => `
+    <div class="discover-committee-group">
+      <div class="discover-committee-group-name">${c} (${grouped[c].length})</div>
+      <div class="discover-members-list">
+        ${grouped[c].map(m => memberMiniCard(m)).join('')}
+      </div>
+    </div>`).join('');
+}
+
+// ── State delegation ─────────────────────────────────────────────
+function renderDelegation(member) {
+  const section = document.getElementById('discover-delegation-section');
+  const container = document.getElementById('discover-delegation-content');
+  section.style.display = 'block';
+
+  const stateFull = stateName(member.state);
+  const delegation = allMembers.filter(m => m.state === member.state && m.id !== member.id);
+  const senators   = delegation.filter(m => m.chamber === 'Senate');
+  const reps       = delegation.filter(m => m.chamber === 'House');
+
+  let html = `<div style="font-family:var(--sans);font-size:0.8rem;color:var(--silver);margin-bottom:10px">${stateFull} · ${delegation.length + 1} total members</div>`;
+
+  if (senators.length) {
+    html += `<div class="discover-chamber-label">Senators</div>
+      <div class="discover-members-list" style="margin-bottom:12px">
+        ${senators.map(m => memberMiniCard(m)).join('')}
+      </div>`;
+  }
+  if (reps.length) {
+    html += `<div class="discover-chamber-label">Representatives (${reps.length})</div>
+      <div class="discover-members-list">
+        ${reps.map(m => memberMiniCard(m)).join('')}
+      </div>`;
+  }
+  if (!delegation.length) {
+    html += '<div class="discover-empty">No other members found for this state.</div>';
+  }
+
+  container.innerHTML = html;
+}
+
+// ── Similar members by ideology score ────────────────────────────
+function renderSimilar(member) {
+  const section   = document.getElementById('discover-similar-section');
+  const note      = document.getElementById('discover-similar-note');
+  const container = document.getElementById('discover-similar-content');
+  section.style.display = 'block';
+
+  // Members need a govtrackIdeology score — may not be loaded yet
+  const scored = allMembers.filter(m =>
+    m.id !== member.id &&
+    typeof m.govtrackIdeology === 'number' &&
+    typeof member.govtrackIdeology === 'number'
+  );
+
+  if (!scored.length) {
+    // Try to load scores for the current member first, then re-render
+    note.textContent = 'Loading ideology scores…';
+    container.innerHTML = '';
+    loadGovtrackForSimilar(member).then(() => renderSimilar(member));
+    return;
+  }
+
+  // Sort by absolute ideology distance
+  const sorted = scored
+    .map(m => ({ m, dist: Math.abs(m.govtrackIdeology - member.govtrackIdeology) }))
+    .sort((a,b) => a.dist - b.dist)
+    .slice(0, 8);
+
+  const ideologyLabel = v =>
+    v < -0.3 ? 'Progressive' : v < 0 ? 'Center-Left' :
+    v < 0.3  ? 'Center-Right' : 'Conservative';
+
+  note.innerHTML = `
+    Ideology score: <strong>${member.govtrackIdeology?.toFixed(2)}</strong>
+    (${ideologyLabel(member.govtrackIdeology)}) ·
+    <span style="color:var(--gold)">−1</span> = most progressive,
+    <span style="color:var(--gold)">+1</span> = most conservative.
+    Scores are based on voting patterns via GovTrack.`;
+
+  container.innerHTML = `<div class="discover-members-list">
+    ${sorted.map(({m, dist}) => `
+      <div class="discover-member" onclick="closeDiscover();openProfile('${m.id}','overview')" role="button" tabindex="0"
+        onkeydown="if(event.key==='Enter'){closeDiscover();openProfile('${m.id}')}">
+        ${m.depiction
+          ? `<img class="discover-member-photo" src="${m.depiction}" alt="${m.name}" loading="lazy" onerror="this.style.display='none'">`
+          : `<div class="discover-member-placeholder">${m.firstName?.[0]||''}${m.lastName?.[0]||''}</div>`}
+        <div class="discover-member-info">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">
+            <div class="discover-member-name">${m.name}</div>
+            <span class="discover-member-badge ${m.party}">${partyLabel(m.party)}</span>
+          </div>
+          <div class="discover-member-role">${m.title} · ${m.state}</div>
+          <div class="discover-match-wrap">
+            <div class="discover-match-label">Match</div>
+            <div class="discover-match-track">
+              <div class="discover-match-fill" style="width:${Math.round((1 - dist) * 100)}%"></div>
+            </div>
+            <div class="discover-match-label">${Math.round((1 - dist) * 100)}%</div>
+          </div>
+        </div>
+      </div>`).join('')}
+  </div>`;
+}
+
+// Load GovTrack ideology for members who don't have it yet
+async function loadGovtrackForSimilar(seedMember) {
+  const GOVTRACK = 'https://www.govtrack.us/api/v2';
+  // Load scores for a sample of members across the spectrum if not yet loaded
+  const needScores = allMembers.filter(m => typeof m.govtrackIdeology !== 'number').slice(0, 60);
+  await Promise.allSettled(needScores.map(async m => {
+    try {
+      const personRes = await fetch(`${GOVTRACK}/person?bioguideid=${m.bioguideId}&limit=1`);
+      const personData = await personRes.json();
+      const pid = personData.objects?.[0]?.id;
+      if (!pid) return;
+      const roleRes = await fetch(`${GOVTRACK}/role?person=${pid}&current=true&limit=1`);
+      const roleData = await roleRes.json();
+      const role = roleData.objects?.[0];
+      if (role?.ideology_score != null) m.govtrackIdeology = role.ideology_score;
+      if (role?.leadership_score != null) m.govtrackLeadership = role.leadership_score;
+    } catch(e) { /* skip */ }
+  }));
+}
+
+// ── Profile panel version (inline in modal) ──────────────────────
+function renderProfileDiscover(member) {
+  const container = document.getElementById('panel-discover-content');
+  container.innerHTML = `
+    <div class="profile-discover-wrap">
+      <div class="profile-discover-section">
+        <div class="profile-discover-section-title">🗺 ${stateName(member.state)} Delegation</div>
+        <div id="profile-delegation-inner"></div>
+      </div>
+      <div class="profile-discover-section" style="margin-top:24px">
+        <div class="profile-discover-section-title" style="display:flex;align-items:center;justify-content:space-between">
+          <span>⚡ Similar Members</span>
+          <button style="font-family:var(--mono);font-size:0.65rem;background:none;border:1px solid var(--border);padding:4px 10px;cursor:pointer;color:var(--blue)" onclick="openDiscover(currentMember)">Open in Sidebar ↗</button>
+        </div>
+        <div id="profile-similar-inner"><div class="discover-empty" style="padding:12px 0">Loading ideology scores…</div></div>
+      </div>
+    </div>`;
+
+  // Delegation
+  const delegation = allMembers.filter(m => m.state === member.state && m.id !== member.id);
+  const senators   = delegation.filter(m => m.chamber === 'Senate');
+  const reps       = delegation.filter(m => m.chamber === 'House').slice(0, 6);
+  let delHtml = '';
+  if (senators.length) delHtml += `<div class="discover-chamber-label">Senators</div><div class="discover-members-list" style="margin-bottom:10px">${senators.map(m => memberMiniCard(m)).join('')}</div>`;
+  if (reps.length)     delHtml += `<div class="discover-chamber-label">Representatives (showing ${reps.length} of ${delegation.filter(m=>m.chamber==='House').length})</div><div class="discover-members-list">${reps.map(m => memberMiniCard(m)).join('')}</div>`;
+  document.getElementById('profile-delegation-inner').innerHTML = delHtml || '<div class="discover-empty">No other members found.</div>';
+
+  // Similar — async
+  const scored = allMembers.filter(m =>
+    m.id !== member.id && typeof m.govtrackIdeology === 'number' && typeof member.govtrackIdeology === 'number'
+  );
+  if (scored.length >= 5) {
+    renderProfileSimilarInner(member, scored);
+  } else {
+    loadGovtrackForSimilar(member).then(() => {
+      const s2 = allMembers.filter(m => m.id !== member.id && typeof m.govtrackIdeology === 'number' && typeof member.govtrackIdeology === 'number');
+      renderProfileSimilarInner(member, s2);
+    });
+  }
+}
+
+function renderProfileSimilarInner(member, scored) {
+  const el = document.getElementById('profile-similar-inner');
+  if (!el) return;
+  if (!scored.length) {
+    el.innerHTML = '<div class="discover-empty">Not enough ideology data loaded yet. Try opening a few member profiles first, then revisit this tab.</div>';
+    return;
+  }
+  const top5 = scored
+    .map(m => ({ m, dist: Math.abs(m.govtrackIdeology - member.govtrackIdeology) }))
+    .sort((a,b) => a.dist - b.dist)
+    .slice(0, 5);
+  el.innerHTML = `<div class="discover-members-list">${top5.map(({m,dist}) => memberMiniCard(m, dist)).join('')}</div>`;
+}
+
+// ── Shared mini card renderer ─────────────────────────────────────
+function memberMiniCard(m, dist) {
+  const matchBar = typeof dist === 'number' ? `
+    <div class="discover-match-wrap">
+      <div class="discover-match-label">Match</div>
+      <div class="discover-match-track"><div class="discover-match-fill" style="width:${Math.round((1-dist)*100)}%"></div></div>
+      <div class="discover-match-label">${Math.round((1-dist)*100)}%</div>
+    </div>` : '';
+  return `
+    <div class="discover-member" onclick="closeDiscover();closeModal();setTimeout(()=>openProfile('${m.id}'),50)" role="button" tabindex="0"
+      onkeydown="if(event.key==='Enter'){closeDiscover();closeModal();setTimeout(()=>openProfile('${m.id}'),50)}">
+      ${m.depiction
+        ? `<img class="discover-member-photo" src="${m.depiction}" alt="${m.name}" loading="lazy" onerror="this.style.display='none'">`
+        : `<div class="discover-member-placeholder">${m.firstName?.[0]||''}${m.lastName?.[0]||''}</div>`}
+      <div class="discover-member-info">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;flex-wrap:wrap">
+          <div class="discover-member-name">${m.name}</div>
+          <span class="discover-member-badge ${m.party}">${partyLabel(m.party)}</span>
+        </div>
+        <div class="discover-member-role">${m.title} · ${m.state}${m.district ? ' Dist. '+m.district : ''}</div>
+        ${matchBar}
+      </div>
+    </div>`;
+}
+
+// ── Also store govtrack scores on member when loaded via votes ────
+// (piggyback on existing loadVotes enrichment)
+const _origLoadVotes = typeof loadVotes === 'function' ? loadVotes : null;
 
 // ═══════════════════════════════════════════════════════
 // ABOUT MODAL
