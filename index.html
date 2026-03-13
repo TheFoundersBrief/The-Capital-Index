@@ -76,6 +76,10 @@
   .search-row { display: flex; gap: 10px; align-items: stretch; }
   .search-wrap { flex: 1; position: relative; }
   .search-wrap::before { content: '⌕'; position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-size: 1.5rem; color: #bbb; pointer-events: none; }
+  .search-clear { position:absolute; right:12px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; color:#bbb; font-size:1rem; line-height:1; padding:4px; display:none; }
+  .search-clear:hover { color:var(--ink); }
+  .search-wrap.has-value .search-clear { display:block; }
+  .search-wrap.has-value input { padding-right:36px; }
   .search-wrap input {
     width: 100%; padding: 13px 20px 13px 50px;
     background: white; border: 2px solid var(--border);
@@ -794,8 +798,9 @@
 
     <section class="search-section">
       <div class="search-row">
-        <div class="search-wrap">
-          <input type="text" id="search-input" placeholder="Search by name, state, or district…" oninput="handleSearch()">
+        <div class="search-wrap" id="search-wrap">
+          <input type="text" id="search-input" placeholder="Search by name, state, or district…" oninput="handleSearch();toggleSearchClear()">
+          <button class="search-clear" id="search-clear" onclick="clearSearch()" title="Clear search" aria-label="Clear search">✕</button>
         </div>
         <select class="filter-select" id="state-filter" onchange="handleFilters()">
           <option value="">All States</option>
@@ -1536,6 +1541,16 @@ function setView(v, el) {
   applyFilters();
 }
 function handleSearch() { applyFilters(); }
+function toggleSearchClear() {
+  const val = document.getElementById('search-input').value;
+  document.getElementById('search-wrap').classList.toggle('has-value', val.length > 0);
+}
+function clearSearch() {
+  document.getElementById('search-input').value = '';
+  document.getElementById('search-wrap').classList.remove('has-value');
+  applyFilters();
+  document.getElementById('search-input').focus();
+}
 function handleFilters() { applyFilters(); }
 
 function showGridLoading(msg) {
