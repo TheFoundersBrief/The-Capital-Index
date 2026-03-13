@@ -1062,6 +1062,8 @@ async function loadAllMembers() {
         applyFilters();
         document.getElementById('nav-status').textContent =
           `${allMembers.length} members loaded`;
+        // Re-run committee prefetch in case it didn't finish last session
+        prefetchCommittees();
         return;
       }
     }
@@ -1100,6 +1102,9 @@ async function loadAllMembers() {
         members: allMembers, social: socialMediaMap, ts: Date.now()
       }));
     } catch(e) { /* storage full or private mode — ignore */ }
+
+    // ── Pre-fetch committee data for all members in background ───────────────
+    prefetchCommittees();
 
   } catch(err) {
     console.error(err);
@@ -2794,6 +2799,56 @@ function renderComparison(el, mA, dA, mB, dB) {
 }
 
 // ═══════════════════════════════════════════════════════
+// COMMITTEE PRE-FETCH  (background, batched)
+// ═══════════════════════════════════════════════════════
+let committeePrefetchDone = false;
+
+async function prefetchCommittees() {
+  if (committeePrefetchDone) return;
+  committeePrefetchDone = true;
+
+  // Only fetch members who don't already have committee data
+  const needed = allMembers.filter(m => !m.committees?.length);
+  if (!needed.length) return;
+
+  const BATCH = 8;   // concurrent requests
+  const DELAY = 120; // ms between batches — keeps Worker load low
+
+  for (let i = 0; i < needed.length; i += BATCH) {
+    const batch = needed.slice(i, i + BATCH);
+    await Promise.allSettled(batch.map(async m => {
+      try {
+        const data = await apiFetch(`/v3/member/${m.bioguideId}`);
+        const d = data?.member;
+        if (!d) return;
+        m.committees = (d.terms?.item || [])
+          .flatMap(t => t.committees || [])
+          .map(c => c.name)
+          .filter((v, idx, a) => a.indexOf(v) === idx)
+          .slice(0, 10);
+        // Also grab yearsInOffice and depiction while we're here
+        const terms = d.terms?.item || [];
+        if (terms.length && !m.yearsInOffice) {
+          const firstYear = parseInt(terms[0].startYear) || 0;
+          if (firstYear) m.yearsInOffice = new Date().getFullYear() - firstYear;
+        }
+        if (d.depiction?.imageUrl && !m.depiction) m.depiction = d.depiction.imageUrl;
+      } catch(e) { /* skip on error */ }
+    }));
+
+    // Small pause between batches to be a good API citizen
+    if (i + BATCH < needed.length) {
+      await new Promise(r => setTimeout(r, DELAY));
+    }
+  }
+
+  // Update status indicator
+  const loaded = allMembers.filter(m => m.committees?.length).length;
+  const statusEl = document.getElementById('nav-status');
+  if (statusEl) statusEl.textContent = `${allMembers.length} members · committees loaded`;
+}
+
+// ═══════════════════════════════════════════════════════
 // DISCOVER SIDEBAR
 // ═══════════════════════════════════════════════════════
 let discoverContext = null; // member object or null for standalone
@@ -2830,7 +2885,12 @@ function filterByCommittee() {
   const container = document.getElementById('discover-committee-results');
 
   if (query.length < 2) {
-    container.innerHTML = '<div class="discover-empty">Start typing a committee name above.</div>';
+    const withCommittees = allMembers.filter(m => m.committees?.length).length;
+    const total = allMembers.length;
+    const pct = total ? Math.round(withCommittees / total * 100) : 0;
+    container.innerHTML = withCommittees < total
+      ? `<div class="discover-empty">Loading committee data… ${withCommittees}/${total} members indexed (${pct}%).<br><span style="font-size:0.65rem">You can start searching now — more results appear as data loads.</span></div>`
+      : `<div class="discover-empty">All ${total} members indexed. Start typing a committee name above.</div>`;
     return;
   }
 
@@ -2840,7 +2900,18 @@ function filterByCommittee() {
   );
 
   if (!matches.length) {
-    container.innerHTML = '<div class="discover-empty">No members found with that committee assignment.<br><span style="font-size:0.65rem">Tip: committees load when a profile is opened — browse a few members first.</span></div>';
+    const withCommittees = allMembers.filter(m => m.committees?.length).length;
+    const totalMembers   = allMembers.length;
+    const pct = totalMembers ? Math.round(withCommittees / totalMembers * 100) : 0;
+    const stillLoading   = withCommittees < totalMembers;
+    container.innerHTML = `<div class="discover-empty">
+      No members found matching "<strong>${query}</strong>".<br>
+      <span style="font-size:0.65rem">
+        ${stillLoading
+          ? `Committee data loading in background… ${withCommittees}/${totalMembers} members indexed (${pct}%). Try again in a moment.`
+          : 'All committees indexed. Check the spelling — try "Armed Services", "Finance", "Judiciary", "Energy", etc.'}
+      </span>
+    </div>`;
     return;
   }
 
