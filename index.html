@@ -3189,7 +3189,7 @@ function renderReportCard(m) {
     <div class="rc-rows">
       ${rc.details.map(d=>`
         <div class="rc-row" ${d.unscored?'style="opacity:0.45"':''}>
-          <div class="rc-row-label">${d.label}${d.unscored?' <span style='font-size:0.55rem;color:#bbb'>(unscored)</span>':''}</div>
+          <div class="rc-row-label">${d.label}${d.unscored?" <span style='font-size:0.55rem;color:#bbb'>(unscored)</span>":""}</div>
           <div class="rc-track"><div class="rc-fill" style="width:${Math.round(d.fill*100)}%;background:${d.color}"></div></div>
           <div class="rc-row-val">${d.display}</div>
         </div>`).join('')}
