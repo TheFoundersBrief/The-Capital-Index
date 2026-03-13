@@ -31,7 +31,7 @@ Live member profiles, legislation tracking, STOCK Act disclosures, campaign fina
 ### Step 1 — Fork or clone this repository
 
 ```bash
-git clone https://github.com/YOUR-USERNAME/capitol-index.git
+git clone https://github.com/TheFoundersBrief/The-Capital-Index
 cd capitol-index
 ```
 
