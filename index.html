@@ -1768,6 +1768,21 @@ function renderOverview(m) {
 // ═══════════════════════════════════════════════════════
 // BILLS PANEL
 // ═══════════════════════════════════════════════════════
+// Maps Congress.gov API bill type codes to www.congress.gov URL slugs
+function typeToSlug(type) {
+  const map = {
+    hr:    'house-bill',
+    s:     'senate-bill',
+    hjres: 'house-joint-resolution',
+    sjres: 'senate-joint-resolution',
+    hconres: 'house-concurrent-resolution',
+    sconres: 'senate-concurrent-resolution',
+    hres:  'house-resolution',
+    sres:  'senate-resolution',
+  };
+  return map[type.toLowerCase()] || type.toLowerCase();
+}
+
 function normalizeBill(b) {
   const action = (b.latestAction?.text || '').toLowerCase();
   let statusClass = 'introduced';
@@ -1784,13 +1799,25 @@ function normalizeBill(b) {
   const sponsorPartyCode = sponsorParty.includes('democrat') ? 'D'
                          : sponsorParty.includes('republican') ? 'R' : '';
 
+  // b.url is the API endpoint (api.congress.gov/v3/bill/119/hr/1) — not a website link.
+  // Convert to the human-readable www.congress.gov URL.
+  let websiteUrl = '';
+  if (b.url) {
+    const m = b.url.match(/\/bill\/(\d+)\/([a-z]+)\/(\d+)/i);
+    if (m) {
+      const [, congress, type, num] = m;
+      websiteUrl = `https://www.congress.gov/bill/${congress}th-congress/${typeToSlug(type)}/${num}`;
+    }
+  }
+
   return {
     number:      `${b.type || ''} ${b.number || ''}`.trim(),
     title:       b.title || 'Untitled',
     introduced:  b.introducedDate || '',
     latestAction:(b.latestAction?.text || '').substring(0, 90),
     congress:    b.congress,
-    url:         b.url || '',
+    url:         websiteUrl,
+    apiUrl:      b.url || '',
     statusClass,
     statusLabel: statusLabels[statusClass],
     sponsorPartyCode,
@@ -3356,8 +3383,24 @@ async function prefetchCommittees() {
     if (statusEl) statusEl.textContent = `${allMembers.length} members · ${enriched} with committees`;
 
   } catch(e) {
-    console.warn('Committee prefetch failed:', e);
+    console.error('Committee prefetch FAILED:', e);
     committeePrefetchDone = false;
+
+    // Surface the error visibly in the nav bar (no devtools needed)
+    const statusEl = document.getElementById('nav-status');
+
+    // Do a raw fetch to see exactly what the Worker returns
+    try {
+      const testUrl = `${PROXY}/legislators/committees-current.json`;
+      const r = await fetch(testUrl);
+      const text = await r.text();
+      console.error('Worker response status:', r.status);
+      console.error('Worker response body (first 300):', text.substring(0, 300));
+      if (statusEl) statusEl.textContent = `Committee error HTTP ${r.status}: ${text.substring(0, 120)}`;
+    } catch(e2) {
+      console.error('Raw fetch also failed:', e2.message);
+      if (statusEl) statusEl.textContent = `Committee fetch blocked: ${e2.message}`;
+    }
   }
 }
 
