@@ -1205,7 +1205,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // ═══════════════════════════════════════════════════════
 // LOAD MEMBERS — paginate through Congress.gov via proxy
 // ═══════════════════════════════════════════════════════
-const CACHE_KEY     = 'capital-index-members-v2';
+const CACHE_KEY     = 'capital-index-members-v3';
 const CACHE_MAX_AGE = 60 * 60 * 1000; // 1 hour in ms
 
 async function loadAllMembers() {
@@ -1235,7 +1235,7 @@ async function loadAllMembers() {
     const [page1, page2, socialRaw] = await Promise.all([
       apiFetch('/v3/member?limit=250&offset=0&currentMember=true'),
       apiFetch('/v3/member?limit=250&offset=250&currentMember=true'),
-      fetch('https://unitedstates.github.io/congress-legislators/legislators-social-media.json')
+      fetch(`${PROXY}/legislators/legislators-social-media.json`)
         .then(r => r.json()).catch(() => []),
     ]);
 
@@ -3286,7 +3286,7 @@ async function prefetchCommittees() {
   if (committeePrefetchDone) return;
   committeePrefetchDone = true; // set eagerly to prevent parallel calls
 
-  const BASE = 'https://unitedstates.github.io/congress-legislators';
+  const BASE = PROXY + '/legislators';
 
   try {
     // Fetch committee names + membership in parallel — 2 requests total
@@ -3336,6 +3336,7 @@ async function prefetchCommittees() {
       }
     }
 
+    console.log(`Committee prefetch complete: ${enriched}/${allMembers.length} members enriched`);
     const statusEl = document.getElementById('nav-status');
     if (statusEl) statusEl.textContent = `${allMembers.length} members · ${enriched} with committees`;
 
@@ -3355,6 +3356,8 @@ function openDiscover(member) {
   document.getElementById('discover-sidebar').classList.add('open');
   document.getElementById('discover-backdrop').classList.add('open');
   document.body.style.overflow = 'hidden';
+  // Retry prefetch if it failed or hasn't run yet
+  if (!committeePrefetchDone) prefetchCommittees();
 
   // Reset committee input
   document.getElementById('discover-committee-input').value = '';
